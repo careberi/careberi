@@ -42,8 +42,8 @@ export default function Contact() {
               <p style={{ marginBottom: 2 }}>
                 <strong>Would rather just talk?</strong>
               </p>
-              <a className="big-phone" href="tel:+15550001234">
-                (555) 000-1234
+              <a className="big-phone" href="tel:+12017010942">
+                (201) 701-0942
               </a>
               <p style={{ fontSize: ".95rem", color: "var(--slate)" }}>
                 A person answers 8am–8pm, seven days. After hours, leave a message and

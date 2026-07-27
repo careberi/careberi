@@ -27,7 +27,7 @@ export default function Jobs() {
               <a className="btn btn-primary" href="#contact">
                 Apply now
               </a>
-              <a className="btn btn-ghost" href="tel:+15550001234">
+              <a className="btn btn-ghost" href="tel:+12017010942">
                 Questions? Call us
               </a>
             </div>

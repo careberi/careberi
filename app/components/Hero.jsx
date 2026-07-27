@@ -27,8 +27,8 @@ export default function Hero() {
             <a className="btn btn-primary" href="#contact">
               Ask for a free home visit
             </a>
-            <a className="btn btn-ghost" href="tel:+15550001234">
-              Call (555) 000-1234
+            <a className="btn btn-ghost" href="tel:+12017010942">
+              Call (201) 701-0942
             </a>
           </div>
           <div className="rating-strip">
