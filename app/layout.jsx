@@ -77,7 +77,6 @@ const jsonLd = {
     "personal care assistance",
     "pro bono home care",
   ],
-  aggregateRating: { "@type": "AggregateRating", ratingValue: "4.9", reviewCount: "32" },
 };
 
 export default function RootLayout({ children }) {

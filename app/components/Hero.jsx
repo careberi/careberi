@@ -1,11 +1,3 @@
-function Star() {
-  return (
-    <svg viewBox="0 0 24 24" fill="#2F80C2">
-      <path d="M12 2l3 6.6 7 .8-5.2 4.8 1.4 7-6.2-3.5L5.8 21l1.4-7L2 9.4l7-.8z" />
-    </svg>
-  );
-}
-
 export default function Hero() {
   return (
     <section className="hero" id="approach">
@@ -30,21 +22,6 @@ export default function Hero() {
             <a className="btn btn-ghost" href="tel:+12017010942">
               Call (201) 701-0942
             </a>
-          </div>
-          <div className="rating-strip">
-            <span className="stars" aria-hidden="true">
-              <Star />
-              <Star />
-              <Star />
-              <Star />
-              <Star />
-            </span>
-            <span>
-              <strong style={{ color: "var(--ink)" }}>4.9</strong> from{" "}
-              <a href="#reviews" style={{ fontWeight: 600 }}>
-                32 Google reviews
-              </a>
-            </span>
           </div>
           <ul className="assure">
             <li>Care can start in 48 hours</li>

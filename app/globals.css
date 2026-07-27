@@ -5,7 +5,6 @@
     --paper:#FFFFFF;        /* main background */
     --tint:#F4F8FC;         /* cloud — light band */
     --cloud:#F4F8FC;
-    --tint-warm:#EAF3FB;    /* pale sky band */
     --navy:#16265C;         /* navy — headers, footer, headings */
     --marigold:#2F80C2;     /* azure — links, icons, secondary accents */
     --azure:#2F80C2;
@@ -100,15 +99,12 @@
   .assure li{display:flex;align-items:center;gap:8px}
   .assure li::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--marigold);flex:none}
   .art{width:100%;height:auto;display:block;border-radius:var(--radius)}
-  .rating-strip{display:flex;align-items:center;gap:12px;margin-top:22px;font-size:.95rem;color:var(--slate)}
-  .rating-strip .stars{display:flex;gap:2px}
 
   /* sections */
   main{background:#FFFFFF}
   section{padding:56px 0;background:#FFFFFF;color:var(--ink);scroll-margin-top:80px}
   .hero{background:#F9FCFE}
   .band-tint{background:var(--tint)}
-  .band-warm{background:var(--tint-warm)}
   .section-head{max-width:62ch;margin-bottom:34px}
   .section-head.center{margin-left:auto;margin-right:auto;text-align:center}
 
@@ -140,27 +136,6 @@
   .step p{margin:0;font-size:.97rem;color:var(--slate)}
   .step .when{font-size:.8rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--marigold-deep)}
 
-  /* ---------- reviews ---------- */
-  .rev-top{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:12px 20px;margin-bottom:30px}
-  .rev-score{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--line);border-radius:999px;
-    padding:10px 20px;box-shadow:var(--shadow);font-weight:600}
-  .rev-score .num{font-size:1.5rem;font-weight:800;letter-spacing:-.03em;line-height:1}
-  .rev-score .sub{font-size:.9rem;color:var(--slate);font-weight:500}
-  .stars{display:inline-flex;gap:2px;vertical-align:middle}
-  .stars svg{width:17px;height:17px}
-  .reviews{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
-  .review{background:#FFFFFF;border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);display:flex;flex-direction:column}
-  .rev-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-  .avatar{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:1.05rem;flex:none}
-  .rev-name{font-weight:700;font-size:1rem;line-height:1.2}
-  .rev-when{font-size:.85rem;color:var(--slate)}
-  .rev-head .g{margin-left:auto;width:20px;height:20px;flex:none}
-  .rev-text{font-size:.98rem;color:var(--slate);margin:10px 0 0;overflow:hidden;
-    display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical}
-  .review.open .rev-text{-webkit-line-clamp:unset;display:block}
-  .more{margin-top:auto;padding:14px 0 0;background:none;border:0;font:inherit;font-size:.95rem;font-weight:600;
-    color:var(--marigold-deep);cursor:pointer;text-align:left}
-  .rev-foot{text-align:center;margin-top:28px}
 
   /* jobs */
   .jobs-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
@@ -217,9 +192,6 @@
   }
 
   /* responsive */
-  @media (max-width:1000px){
-    .reviews{grid-template-columns:repeat(2,1fr)}
-  }
   @media (max-width:1150px){
     .nav-toggle{display:block}
     .bar .phone{display:none}
@@ -254,9 +226,6 @@
     .brand .tag{display:none}
     .brand .name{font-size:1.3rem}
     .btn{width:100%}
-    /* reviews swipe on phones */
-    .reviews{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:14px;padding-bottom:8px;margin:0 -24px;padding-left:24px;padding-right:24px}
-    .review{min-width:80%;scroll-snap-align:start}
   }
 
 

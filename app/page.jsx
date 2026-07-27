@@ -3,7 +3,6 @@ import Header from "./components/Header";
 import Hero from "./components/Hero";
 import Approach from "./components/Approach";
 import Services from "./components/Services";
-import Reviews from "./components/Reviews";
 import Steps from "./components/Steps";
 import ProBono from "./components/ProBono";
 import Jobs from "./components/Jobs";
@@ -21,7 +20,6 @@ export default function Home() {
         <Hero />
         <Approach />
         <Services />
-        <Reviews />
         <Steps />
         <ProBono />
         <Jobs />

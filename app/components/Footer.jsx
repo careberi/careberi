@@ -39,6 +39,12 @@ export default function Footer() {
           <br />
           <a href="#">Family Portal</a> · <a href="#">Privacy</a>
         </div>
+        <div>
+          <p style={{ marginBottom: 10 }}>Worked with us?</p>
+          <a className="btn btn-ghost" href="#" rel="noopener">
+            Leave a review on Google
+          </a>
+        </div>
       </div>
     </footer>
   );
