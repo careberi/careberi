@@ -166,11 +166,13 @@
   /* contact */
   .contact-grid{display:grid;grid-template-columns:1fr 1.05fr;gap:52px;align-items:start}
   form{display:grid;gap:16px}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
   label{display:block;font-weight:600;font-size:.95rem;margin-bottom:6px}
-  input,textarea{width:100%;font-family:inherit;font-size:1.02rem;color:var(--ink);padding:14px 16px;
+  input,textarea,select{width:100%;font-family:inherit;font-size:1.02rem;color:var(--ink);padding:14px 16px;
     border:2px solid var(--line);border-radius:12px;background:#fff}
-  input:focus,textarea:focus{border-color:var(--marigold)}
+  input:focus,textarea:focus,select:focus{border-color:var(--marigold)}
   textarea{min-height:110px;resize:vertical}
+  input[type="file"]{padding:11px 16px}
   .field-note{font-size:.88rem;color:var(--slate);margin:6px 0 0}
   .callout{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow)}
   .callout p:last-child{margin-bottom:0}
@@ -226,6 +228,7 @@
     .brand .tag{display:none}
     .brand .name{font-size:1.3rem}
     .btn{width:100%}
+    .field-row{grid-template-columns:1fr}
   }
 
 
