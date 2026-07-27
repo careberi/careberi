@@ -2,12 +2,15 @@
 
 import { useState } from "react";
 import Reveal from "./Reveal";
+import { submitContactForm } from "../actions/contact";
 
 export default function Contact() {
   const [sent, setSent] = useState(false);
   const [errorField, setErrorField] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(false);
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     const form = e.currentTarget;
     for (const id of ["name", "phone", "town"]) {
@@ -18,6 +21,18 @@ export default function Contact() {
       }
     }
     setErrorField(null);
+    setSubmitError(false);
+    setSubmitting(true);
+
+    const result = await submitContactForm(new FormData(form));
+
+    setSubmitting(false);
+
+    if (!result.success) {
+      setSubmitError(true);
+      return;
+    }
+
     setSent(true);
     form.reset();
   }
@@ -77,10 +92,16 @@ export default function Contact() {
               <label htmlFor="best">Best time to reach you</label>
               <input id="best" name="best" type="text" placeholder="Weekday mornings, after 6pm, anytime…" />
             </div>
-            <button className="btn btn-primary" type="submit">
-              Send request
+            <button className="btn btn-primary" type="submit" disabled={submitting}>
+              {submitting ? "Sending…" : "Send request"}
             </button>
             <p className="field-note">We never sell or share your information.</p>
+            {submitError && (
+              <p role="alert" style={{ color: "#C2372F" }}>
+                Something went wrong sending your request. Please call us instead at{" "}
+                <a href="tel:+12017010942">(201) 701-0942</a>.
+              </p>
+            )}
             {sent && (
               <p id="sent" role="status" style={{ display: "block" }}>
                 Sent. A care manager will call you at the number you gave us — usually

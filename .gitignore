@@ -4,5 +4,6 @@
 /build
 .DS_Store
 *.pem
+.env
 .env*.local
 npm-debug.log*
