@@ -13,9 +13,7 @@ export default function ProBono() {
     <Reveal className="probono" id="probono">
       <div className="wrap probono-grid">
         <div>
-          <p className="eyebrow">
-            <span className="brand-name">careberi</span> care · Pro bono program
-          </p>
+          <p className="eyebrow">careberi care · Pro bono program</p>
           <h2>
             Free home care for New Jersey families in{" "}
             <span className="hl">financial hardship.</span>
