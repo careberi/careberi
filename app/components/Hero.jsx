@@ -17,14 +17,14 @@ export default function Hero() {
           </p>
           <div className="hero-actions">
             <a className="btn btn-primary" href="/?reason=general#contact">
-              Ask for a free home visit
+              Get started
             </a>
             <a className="btn btn-ghost" href="tel:+12017010942">
               Call (201) 701-0942
             </a>
           </div>
           <ul className="assure">
-            <li>Care can start in 48 hours</li>
+            <li>Care can start in 24 hours</li>
             <li>No long-term contract</li>
             <li>Licensed, bonded, insured</li>
           </ul>

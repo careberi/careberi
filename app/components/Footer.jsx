@@ -29,7 +29,7 @@ export default function Footer() {
           <br />
           <a href="mailto:care@careberi.com">care@careberi.com</a>
           <br />
-          8am–8pm, seven days a week
+          Open 24/7
         </div>
         <div>
           <a href="#approach">Our Approach</a> · <a href="#services">Our Services</a>
