@@ -16,7 +16,7 @@ export default function Hero() {
             and someone who answers it.
           </p>
           <div className="hero-actions">
-            <a className="btn btn-primary" href="#contact">
+            <a className="btn btn-primary" href="/?reason=general#contact">
               Ask for a free home visit
             </a>
             <a className="btn btn-ghost" href="tel:+12017010942">

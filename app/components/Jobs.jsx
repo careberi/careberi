@@ -24,7 +24,7 @@ export default function Jobs() {
               respects the work.
             </p>
             <div className="jobs-cta">
-              <a className="btn btn-primary" href="#contact">
+              <a className="btn btn-primary" href="/?reason=employment#contact">
                 Apply now
               </a>
               <a className="btn btn-ghost" href="tel:+12017010942">

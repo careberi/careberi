@@ -13,14 +13,16 @@ export default function ProBono() {
     <Reveal className="probono" id="probono">
       <div className="wrap probono-grid">
         <div>
-          <p className="eyebrow">careberi Cares · Pro bono program</p>
+          <p className="eyebrow">
+            <span className="brand-name">careberi</span> care · Pro bono program
+          </p>
           <h2>
             Free home care for New Jersey families in{" "}
             <span className="hl">financial hardship.</span>
           </h2>
           <p className="lede">
             Cost should not decide whether someone gets to stay home. Through
-            careberi Cares, we set aside a number of fully pro bono caregiving hours
+            careberi care, we set aside a number of fully pro bono caregiving hours
             each month for seniors and adults with disabilities who can&apos;t afford
             care and don&apos;t qualify for other help.
           </p>
@@ -57,15 +59,15 @@ export default function ProBono() {
             confidentially, and with no obligation.
           </p>
           <div className="pb-actions">
-            <a className="btn btn-primary" href="#contact">
-              Apply for careberi Cares
+            <a className="btn btn-primary" href="/?reason=probono#contact">
+              Apply for careberi care
             </a>
-            <a className="btn btn-ghost" href="#contact">
+            <a className="btn btn-ghost" href="/?reason=probono#contact">
               Nominate a neighbor
             </a>
           </div>
           <p style={{ fontSize: ".88rem", color: "var(--muted)", margin: "16px 0 0" }}>
-            Want to help fund free care hours? Ask us about sponsoring careberi Cares.
+            Want to help fund free care hours? Ask us about sponsoring careberi care.
           </p>
         </div>
       </div>

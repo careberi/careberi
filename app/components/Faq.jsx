@@ -11,7 +11,7 @@ const faqs = [
   },
   {
     q: "Do you offer free or reduced-cost care?",
-    a: "Yes. Through careberi Cares, our pro bono program, we set aside free caregiving hours each month for New Jersey seniors and adults with disabilities in financial hardship who don't qualify for other help. Anyone can apply or nominate someone — a family member, a social worker, or the person themselves.",
+    a: "Yes. Through careberi care, our pro bono program, we set aside free caregiving hours each month for New Jersey seniors and adults with disabilities in financial hardship who don't qualify for other help. Anyone can apply or nominate someone — a family member, a social worker, or the person themselves.",
   },
   {
     q: "My parent says they don't need help. Now what?",

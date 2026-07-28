@@ -45,7 +45,7 @@ export default function Header() {
               {l.label}
             </a>
           ))}
-          <a className="cta" href="#contact" onClick={() => setOpen(false)}>
+          <a className="cta" href="/?reason=general#contact" onClick={() => setOpen(false)}>
             Request Care
           </a>
         </nav>

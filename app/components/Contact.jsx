@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Reveal from "./Reveal";
 import { submitContactForm } from "../actions/contact";
 import { createClient } from "../../lib/supabase/client";
 
 const REASONS = [
   { value: "general", label: "Learn more about our services" },
-  { value: "probono", label: "Pro bono care (careberi Cares)" },
+  { value: "probono", label: "Pro bono care (careberi care)" },
   { value: "partner", label: "Partnership inquiry" },
   { value: "employment", label: "I'm looking for a caregiving job" },
 ];
@@ -16,7 +16,7 @@ const CONFIRMATIONS = {
   general:
     "Sent. A care manager will call you at the number you gave us — usually within the hour.",
   probono:
-    "Sent. A care manager will review your careberi Cares request and follow up within a few days.",
+    "Sent. A care manager will review your careberi care request and follow up within a few days.",
   partner:
     "Sent. Our partnerships team will review this and reach out about working together.",
   employment:
@@ -42,6 +42,14 @@ export default function Contact() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(false);
   const [reason, setReason] = useState("");
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const requested = params.get("reason");
+    if (REASONS.some((r) => r.value === requested)) {
+      setReason(requested);
+    }
+  }, []);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -153,9 +161,11 @@ export default function Contact() {
           </div>
 
           {sent ? (
-            <p id="sent" role="status" style={{ display: "block" }}>
-              {CONFIRMATIONS[sentReason]}
-            </p>
+            <div className="sent-wrap">
+              <p id="sent" role="status" style={{ display: "block" }}>
+                {CONFIRMATIONS[sentReason]}
+              </p>
+            </div>
           ) : (
             <form id="care-form" noValidate onSubmit={handleSubmit}>
               <div className="field-row">

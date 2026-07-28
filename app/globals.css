@@ -165,6 +165,7 @@
 
   /* contact */
   .contact-grid{display:grid;grid-template-columns:1fr 1.05fr;gap:52px;align-items:start}
+  .sent-wrap{align-self:stretch;display:flex;align-items:center;justify-content:center}
   form{display:grid;gap:16px}
   .field-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
   label{display:block;font-weight:600;font-size:.95rem;margin-bottom:6px}
@@ -236,6 +237,7 @@
 .probono{background:linear-gradient(180deg,#FBEEF3 0%,#F7E3EC 100%);border-radius:28px;margin:0 24px;padding:52px 0}
 .probono .wrap{padding:0 32px}
 .probono .eyebrow{color:var(--berry-deep)}
+.probono .eyebrow .brand-name{color:var(--navy)}
 .probono .hl{color:var(--berry-deep)}
 .probono-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:44px;align-items:center}
 .pb-points{list-style:none;padding:0;margin:18px 0 0;display:grid;gap:12px}

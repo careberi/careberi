@@ -64,7 +64,7 @@ export default function Partnerships() {
           ))}
         </div>
         <div className="partner-cta">
-          <a className="btn btn-primary" href="#contact">
+          <a className="btn btn-primary" href="/?reason=partner#contact">
             Become a partner
           </a>
         </div>
