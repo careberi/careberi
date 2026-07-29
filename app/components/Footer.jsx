@@ -25,7 +25,7 @@ export default function Footer() {
           Licensed, bonded, and insured · NJ HCSA #0000000
         </div>
         <div>
-          <a href="tel:+12017010942">(201) 701-0942</a>
+          <a href="tel:+12012665450">(201) 266-5450</a>
           <br />
           <a href="mailto:care@careberi.com">care@careberi.com</a>
           <br />

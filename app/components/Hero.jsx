@@ -19,8 +19,8 @@ export default function Hero() {
             <a className="btn btn-primary" href="/?reason=general#contact">
               Get started
             </a>
-            <a className="btn btn-ghost" href="tel:+12017010942">
-              Call (201) 701-0942
+            <a className="btn btn-ghost" href="tel:+12012665450">
+              Call (201) 266-5450
             </a>
           </div>
           <ul className="assure">

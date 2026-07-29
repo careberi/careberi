@@ -625,7 +625,7 @@ export default function Contact() {
         {submitError && (
           <p role="alert" style={{ color: "#C2372F" }}>
             Something went wrong sending your request. Please call us instead at{" "}
-            <a href="tel:+12017010942">(201) 701-0942</a>.
+            <a href="tel:+12012665450">(201) 266-5450</a>.
           </p>
         )}
       </form>
@@ -660,7 +660,7 @@ export default function Contact() {
         {submitError && (
           <p role="alert" style={{ color: "#C2372F" }}>
             Something went wrong sending your request. Please call us instead at{" "}
-            <a href="tel:+12017010942">(201) 701-0942</a>.
+            <a href="tel:+12012665450">(201) 266-5450</a>.
           </p>
         )}
       </form>
@@ -685,7 +685,7 @@ export default function Contact() {
         {submitError && (
           <p role="alert" style={{ color: "#C2372F" }}>
             Something went wrong sending your request. Please call us instead at{" "}
-            <a href="tel:+12017010942">(201) 701-0942</a>.
+            <a href="tel:+12012665450">(201) 266-5450</a>.
           </p>
         )}
       </form>
@@ -734,8 +734,8 @@ export default function Contact() {
               <p style={{ marginBottom: 2 }}>
                 <strong>Would rather just talk?</strong>
               </p>
-              <a className="big-phone" href="tel:+12017010942">
-                (201) 701-0942
+              <a className="big-phone" href="tel:+12012665450">
+                (201) 266-5450
               </a>
               <p style={{ fontSize: ".95rem", color: "var(--slate)" }}>
                 A person answers 24/7, every day of the year.

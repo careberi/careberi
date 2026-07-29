@@ -4,7 +4,7 @@ export default function UtilityBar() {
       <div className="wrap">
         <div className="u-left">
           To get care today, call or text{" "}
-          <a href="tel:+12017010942">(201) 701-0942</a>
+          <a href="tel:+12012665450">(201) 266-5450</a>
         </div>
         <div className="u-right">
           <a className="portal" href="#" rel="noopener">

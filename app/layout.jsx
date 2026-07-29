@@ -19,7 +19,7 @@ export const metadata = {
   metadataBase: new URL("https://www.careberi.com"),
   title: "Non-Medical Home Care in New Jersey | careberi — Senior & Disability Care",
   description:
-    "careberi provides non-medical home care in New Jersey for seniors and people with disabilities. Trained, background-checked caregivers help with bathing, meals, medication reminders, and companionship at home. Free in-home assessment — call (201) 701-0942.",
+    "careberi provides non-medical home care in New Jersey for seniors and people with disabilities. Trained, background-checked caregivers help with bathing, meals, medication reminders, and companionship at home. Free in-home assessment — call (201) 266-5450.",
   keywords: [
     "home care New Jersey",
     "non-medical home care NJ",
@@ -43,10 +43,6 @@ export const metadata = {
     siteName: "careberi",
   },
   twitter: { card: "summary_large_image" },
-  icons: {
-    icon:
-      "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 300'%3E%3Ccircle cx='117' cy='120' r='24' fill='%235AA9DE'/%3E%3Ccircle cx='165' cy='120' r='24' fill='%232A5D9F'/%3E%3Ccircle cx='93' cy='158' r='24' fill='%232F80C2'/%3E%3Ccircle cx='141' cy='158' r='24' fill='%2316265C'/%3E%3Ccircle cx='189' cy='158' r='24' fill='%235AA9DE'/%3E%3Ccircle cx='93' cy='196' r='24' fill='%232A5D9F'/%3E%3Ccircle cx='141' cy='196' r='24' fill='%232F80C2'/%3E%3Ccircle cx='189' cy='196' r='24' fill='%2316265C'/%3E%3Ccircle cx='117' cy='234' r='24' fill='%2316265C'/%3E%3Ccircle cx='165' cy='234' r='24' fill='%232F80C2'/%3E%3Ccircle cx='141' cy='272' r='24' fill='%232A5D9F'/%3E%3C/svg%3E",
-  },
 };
 
 const jsonLd = {
@@ -57,7 +53,7 @@ const jsonLd = {
   description:
     "Non-medical home care agency serving New Jersey seniors and people with disabilities with personal care, companionship, meal preparation, medication reminders, transportation, respite care, and a pro bono care program for families in financial hardship.",
   url: "https://www.careberi.com/",
-  telephone: "+1-201-701-0942",
+  telephone: "+1-201-266-5450",
   email: "care@careberi.com",
   areaServed: { "@type": "State", name: "New Jersey" },
   address: { "@type": "PostalAddress", addressRegion: "NJ", addressCountry: "US" },
