@@ -76,6 +76,38 @@ function formatHour(h) {
   return `${hour12}:00 ${period}`;
 }
 
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// Guards against transient network blips (e.g. a brief connectivity hiccup
+// between the host and Supabase) so a real visitor's submission doesn't get
+// lost to a one-off failure. Retries silently before surfacing any error.
+async function submitContactFormWithRetry(payload, attempts = 3) {
+  let result;
+  for (let i = 0; i < attempts; i++) {
+    result = await submitContactForm(payload);
+    if (result.success) return result;
+    if (i < attempts - 1) await sleep(500 * (i + 1));
+  }
+  return result;
+}
+
+async function uploadResumeWithRetry(supabase, resumeFile, attempts = 3) {
+  let lastError = null;
+  for (let i = 0; i < attempts; i++) {
+    // Unique path per attempt: if a prior attempt actually succeeded server-side
+    // but the response was lost to the network, a retry can't collide with it
+    // (the resumes bucket only allows INSERT, not overwrite).
+    const path = `${Date.now()}-${i}-${resumeFile.name}`;
+    const { error } = await supabase.storage.from("resumes").upload(path, resumeFile);
+    if (!error) return { path, error: null };
+    lastError = error;
+    if (i < attempts - 1) await sleep(500 * (i + 1));
+  }
+  return { path: null, error: lastError };
+}
+
 const initialFormData = {
   name: "",
   email: "",
@@ -88,8 +120,8 @@ const initialFormData = {
   endDate: "",
   timeStart: 9,
   timeEnd: 17,
-  payMin: 25,
-  payMax: 30,
+  payMin: 33,
+  payMax: 45,
   careRecipient: "",
   recipientGender: "female",
   recipientAgeRange: "",
@@ -201,10 +233,7 @@ export default function Contact() {
     let resumePath = null;
     if (formData.reason === "employment" && resumeFile) {
       const supabase = createClient();
-      const path = `${Date.now()}-${resumeFile.name}`;
-      const { error: uploadError } = await supabase.storage
-        .from("resumes")
-        .upload(path, resumeFile);
+      const { path, error: uploadError } = await uploadResumeWithRetry(supabase, resumeFile);
       if (uploadError) {
         setSubmitting(false);
         setSubmitError(true);
@@ -215,7 +244,7 @@ export default function Contact() {
 
     const phoneDigits = formData.phone.replace(/\D/g, "");
 
-    const result = await submitContactForm({
+    const result = await submitContactFormWithRetry({
       name: formData.name,
       email: formData.email,
       phone: phoneDigits,
@@ -512,7 +541,7 @@ export default function Contact() {
             valueMin={formData.payMin}
             valueMax={formData.payMax}
             onChange={(lo, hi) => {
-              set("payMin", Math.min(lo, 30));
+              set("payMin", lo);
               set("payMax", hi);
             }}
           />
