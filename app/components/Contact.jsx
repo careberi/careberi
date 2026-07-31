@@ -500,7 +500,7 @@ export default function Contact() {
         }}
       >
         <h3>What would you like to pay for care?</h3>
-        <p className="wizard-sub">The average range in your area is $20–$30/hr.</p>
+        <p className="wizard-sub">The average range in your area is $33–$45/hr.</p>
         <div className="wizard-field">
           <p style={{ fontSize: "1.4rem", fontWeight: 800, marginBottom: 4 }}>
             ${formData.payMin}–{formData.payMax} <span style={{ fontSize: ".95rem", color: "var(--slate)", fontWeight: 500 }}>/hr</span>
@@ -512,7 +512,7 @@ export default function Contact() {
             valueMin={formData.payMin}
             valueMax={formData.payMax}
             onChange={(lo, hi) => {
-              set("payMin", lo);
+              set("payMin", Math.min(lo, 30));
               set("payMax", hi);
             }}
           />
