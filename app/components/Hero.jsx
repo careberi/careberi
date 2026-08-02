@@ -5,7 +5,7 @@ export default function Hero() {
         <div>
           <p className="eyebrow">Non-medical home care · New Jersey</p>
           <h1>
-            In-home care that lets your loved one{" "}
+            In-home care that lets you or your loved one{" "}
             <span className="hl">stay home in New Jersey.</span>
           </h1>
           <p className="lede">
@@ -24,7 +24,6 @@ export default function Hero() {
             </a>
           </div>
           <ul className="assure">
-            <li>Care can start in 24 hours</li>
             <li>No long-term contract</li>
             <li>Licensed, bonded, insured</li>
           </ul>

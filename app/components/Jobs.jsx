@@ -2,7 +2,7 @@ import Reveal from "./Reveal";
 
 const perks = [
   { title: "Flexible schedules", body: "Day, evening, overnight, and weekend shifts near where you live." },
-  { title: "Competitive pay", body: "Weekly pay, overtime, and travel between clients accounted for." },
+  { title: "Competitive pay", body: "Same-day pay options available, and travel between clients accounted for." },
   { title: "Paid training", body: "Ongoing training and support, including dementia and fall-prevention care." },
   { title: "Real support", body: "A care manager who answers the phone when you need backup." },
 ];
