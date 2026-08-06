@@ -11,7 +11,7 @@ const paths = [
   },
   {
     q: "I've been doing this by myself for a while.",
-    a: "Give you a night off this week. Respite care can be one afternoon, a weekend, or a standing overnight so you sleep. You don't have to hand over everything — pick the shifts that are breaking you and keep the rest.",
+    a: "Give you a night off this week. Respite care can be one afternoon, a weekend, or a standing night so you can sleep. You don't have to hand over everything — hand off the shifts that are wearing you down and keep the rest.",
   },
 ];
 

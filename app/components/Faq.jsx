@@ -3,7 +3,7 @@ import Reveal from "./Reveal";
 const faqs = [
   {
     q: "What does it cost?",
-    a: "Hourly care runs $32–$38 an hour depending on the level of help and the time of day, with a 4-hour minimum per visit. Overnight and live-in care are billed at a flat daily rate. You'll have the exact weekly number in writing before you commit to anything.",
+    a: "Hourly care runs $36–$50 an hour depending on the level of help and the time of day. You'll have the exact weekly number in writing before you commit to anything.",
   },
   {
     q: "How fast can you start?",

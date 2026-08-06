@@ -7,7 +7,7 @@ const steps = [
     body: "Call or send the form. A care manager — not a call center — asks about your loved one and answers what you ask.",
   },
   {
-    when: "Free · about an hour",
+    when: "About an hour",
     title: "We visit the home",
     body: "We meet your loved one where they live, look at the real risks, and listen to what they want. You're welcome to join by phone.",
   },
