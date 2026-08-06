@@ -49,7 +49,7 @@ const services = [
   },
   {
     title: "Overnight & 24-hour",
-    body: "Awake overnight care, or live-in support when nights have become the hardest part.",
+    body: "Awake overnight care when nights have become the hardest part.",
     icon: <path d="M3 12a9 9 0 0118 0M3 12v4a2 2 0 002 2h1v-6H5a2 2 0 00-2 2zM21 12v4a2 2 0 01-2 2h-1v-6h1a2 2 0 012 2z" />,
   },
   {
