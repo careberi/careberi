@@ -14,8 +14,10 @@ import Footer from "./components/Footer";
 export default function Home() {
   return (
     <>
-      <UtilityBar />
-      <Header />
+      <div className="topbar">
+        <UtilityBar />
+        <Header />
+      </div>
       <main id="top">
         <Hero />
         <Approach />

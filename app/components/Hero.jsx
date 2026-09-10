@@ -1,8 +1,26 @@
+const steps = [
+  {
+    n: "01",
+    title: "A home visit",
+    desc: "We come to you to understand what help is needed.",
+  },
+  {
+    n: "02",
+    title: "A written care plan",
+    desc: "Hours, tasks, and who is coming — on paper, and yours to change.",
+  },
+  {
+    n: "03",
+    title: "Care begins",
+    desc: "A few hours a week or 24-hour care. No long-term contract.",
+  },
+];
+
 export default function Hero() {
   return (
     <section className="hero" id="approach">
       <div className="wrap hero-grid">
-        <div>
+        <div className="hero-copy">
           <p className="eyebrow">Non-medical home care · New Jersey</p>
           <h1>
             In-home care that lets you or your loved one{" "}
@@ -20,42 +38,29 @@ export default function Hero() {
               Get started
             </a>
             <a className="btn btn-ghost" href="tel:+12012665450">
-              Call (201) 266-5450
+              Call 201-266-5450
             </a>
           </div>
           <ul className="assure">
             <li>No long-term contract</li>
-            <li>Licensed, bonded, insured</li>
           </ul>
         </div>
-        <div className="art-wrap">
-          <svg
-            className="art"
-            viewBox="0 0 520 420"
-            role="img"
-            aria-label="Illustration of a house with lit windows and a tree beside it"
-          >
-            <rect width="520" height="420" rx="18" fill="#EAF3FB" />
-            <circle cx="392" cy="112" r="66" fill="#C4DEF2" />
-            <path d="M0 330h520v90H0z" fill="#D6E9F7" />
-            <path d="M0 330c90-26 150 10 240-4s190-30 280 4v90H0z" fill="#C4DEF2" />
-            <rect x="96" y="268" width="14" height="66" rx="7" fill="#7FA6C9" />
-            <circle cx="103" cy="248" r="52" fill="#93CDEC" />
-            <circle cx="70" cy="272" r="32" fill="#93CDEC" />
-            <circle cx="136" cy="274" r="30" fill="#D6E9F7" />
-            <path d="M196 210l104-76 104 76v124H196z" fill="#FFFFFF" />
-            <path d="M180 214l120-88 120 88-10 14-110-80-110 80z" fill="#5AA9DE" />
-            <rect x="286" y="268" width="42" height="66" rx="6" fill="#D6E9F7" />
-            <circle cx="318" cy="302" r="3.5" fill="#16265C" />
-            <rect x="220" y="228" width="46" height="42" rx="6" fill="#5AA9DE" />
-            <rect x="348" y="228" width="46" height="42" rx="6" fill="#5AA9DE" />
-            <path
-              d="M243 228v42M220 249h46M371 228v42M348 249h46"
-              stroke="#FFFFFF"
-              strokeWidth="4"
-              opacity=".85"
-            />
-          </svg>
+
+        <div className="hero-steps">
+          <p className="hero-steps-label">How care starts</p>
+          <ol className="hero-steps-list">
+            {steps.map((s) => (
+              <li className="hero-step" key={s.n}>
+                <span className="hero-step-num" aria-hidden="true">
+                  {s.n}
+                </span>
+                <div>
+                  <div className="hero-step-title">{s.title}</div>
+                  <p className="hero-step-desc">{s.desc}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
         </div>
       </div>
     </section>

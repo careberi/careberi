@@ -10,8 +10,8 @@
     --azure:#2F80C2;
     --marigold-deep:#16265C;/* navy — hover / deep accent */
     --leaf:#5AA9DE;         /* sky — second color for two-tone headings */
-    --berry:#D25680;        /* berry-rose — primary CTA only */
-    --berry-deep:#B8446B;   /* berry hover */
+    --berry:#B0486E;        /* berry-rose — primary CTA only; white text ~5.2:1 (AA) */
+    --berry-deep:#973C5E;   /* berry hover */
     --ocean:#2A5D9F;       /* ocean — mid blue */
     --muted:#6B7280;        /* muted — captions, labels */
     --line:#E2E8F0;
@@ -54,11 +54,17 @@
   .btn-ghost{background:#fff;color:var(--navy);border-color:var(--navy)}
   .btn-ghost:hover{background:var(--cloud)}
   .btn:active{transform:translateY(1px)}
+  /* Paired CTAs share a row evenly so both buttons match in width and height.
+     nowrap keeps a button from shrinking its label instead of taking its share. */
+  .hero-actions .btn,
+  .pb-actions .btn,
+  .jobs-cta .btn{flex:1 1 0;white-space:nowrap}
   a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,textarea:focus-visible{
     outline:3px solid var(--marigold-deep);outline-offset:3px;border-radius:6px}
 
   /* utility bar */
-  .utility{background:var(--navy);color:#EAF0FA;font-size:.86rem}
+  /* darker than the navy hero so the two blocks separate across the white nav */
+  .utility{background:#0F1B3D;color:#EAF0FA;font-size:.86rem}
   .utility .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:8px 24px}
   .utility a{color:#fff;text-decoration:none;font-weight:600}
   .utility .u-left a{text-decoration:underline;text-underline-offset:2px}
@@ -68,8 +74,11 @@
   .utility .portal{background:rgba(255,255,255,.12);padding:5px 14px;border-radius:8px;font-weight:600;color:#fff}
   .utility .portal:hover{background:rgba(255,255,255,.22)}
 
+  /* sticky top bar — utility strip + nav travel together */
+  .topbar{position:sticky;top:0;z-index:60}
+
   /* header */
-  header{position:sticky;top:0;z-index:50;background:#FFFFFF;border-bottom:1px solid var(--line)}
+  header{position:relative;z-index:1;background:#FFFFFF;border-bottom:1px solid var(--line)}
   .bar{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:14px 24px;max-width:var(--maxw);margin:0 auto}
   /* main nav */
   .nav{display:flex;align-items:center;gap:22px;margin-left:auto}
@@ -79,31 +88,62 @@
   .nav a.cta:hover{background:var(--berry-deep);color:#fff}
   .nav-toggle{display:none;background:none;border:0;cursor:pointer;padding:8px;margin-left:auto}
   .nav-toggle svg{width:26px;height:26px;stroke:var(--navy)}
-  .brand{display:flex;align-items:center;gap:12px;text-decoration:none}
-  .brand .mark{width:34px;height:auto;flex:none}
-  .brand .wordmark{display:flex;flex-direction:column;line-height:1}
-  .brand .name{font-family:var(--font-poppins),sans-serif;font-weight:600;font-size:1.5rem;letter-spacing:-.028em;line-height:1;white-space:nowrap}
+  .brand{display:flex;align-items:center;gap:11px;text-decoration:none;line-height:1;
+    font-family:var(--font-poppins),system-ui,sans-serif}
+  .brand .mark{width:46px;height:auto;flex:0 0 auto}
+  .brand .wordmark{display:block}
+  .brand .name{display:block;font-weight:600;font-size:32px;letter-spacing:-.93px;white-space:nowrap}
   .brand .name .care{color:var(--navy)}
   .brand .name .beri{color:var(--marigold)}
-  .brand .tag{margin-top:3px;font-weight:500;font-size:.6rem;letter-spacing:.24em;text-transform:uppercase;color:#6b7280;white-space:nowrap}
+  /* Header.jsx recomputes letter-spacing at runtime so the tagline sits flush with the wordmark.
+     These are the pre-hydration defaults — already within a hair of the computed value.
+     margin-right cancels the trailing letter-space, which would otherwise overhang the last E. */
+  .brand .tag{display:block;margin-top:4px;font-weight:500;font-size:8px;letter-spacing:.888px;
+    margin-right:-.888px;text-transform:uppercase;color:#6b7280;white-space:nowrap}
   .bar .phone{display:flex;align-items:center;gap:9px;text-decoration:none;font-weight:600;background:#fff;
     border:1px solid var(--line);padding:10px 18px;border-radius:999px;box-shadow:var(--shadow);white-space:nowrap}
   .bar .phone small{display:block;font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);line-height:1}
   .bar .phone b{font-weight:700;font-size:1.02rem;letter-spacing:-.01em}
 
   /* hero */
-  .hero{padding:60px 0 44px}
-  .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center}
-  .hero-actions{display:flex;flex-wrap:wrap;gap:14px;margin-top:28px}
-  .assure{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:26px;padding:0;list-style:none;color:var(--slate);font-size:.95rem}
+  .hero{padding:78px 0 70px}
+  .hero-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:64px;align-items:center}
+  .hero-copy{display:flex;flex-direction:column;gap:26px}
+  .hero-copy > *{margin:0}
+  .hero-actions{display:flex;flex-wrap:wrap;gap:14px}
+  .assure{display:flex;flex-wrap:wrap;gap:8px 22px;padding:0;list-style:none;color:#9FB6D6;font-size:.95rem}
   .assure li{display:flex;align-items:center;gap:8px}
-  .assure li::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--marigold);flex:none}
-  .art{width:100%;height:auto;display:block;border-radius:var(--radius)}
+  .assure li::before{content:"";width:8px;height:8px;border-radius:50%;background:#93CDEC;flex:none}
+
+  /* hero on navy */
+  .hero .eyebrow{color:#93CDEC}
+  .hero h1{color:#FFFFFF;font-size:clamp(38px,5vw,64px);line-height:1.05;letter-spacing:-.035em}
+  .hero .hl{color:#93CDEC}
+  .hero .lede{color:#C3D6EA}
+  .hero .btn-ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.45)}
+  .hero .btn-ghost:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.7)}
+
+  /* hero — how care starts */
+  .hero-steps-label{font-family:var(--font-poppins),var(--font-inter),sans-serif;font-weight:600;
+    font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:#93CDEC;margin:0 0 22px}
+  .hero-steps-list{list-style:none;margin:0;padding:0}
+  .hero-step{display:flex;gap:24px;align-items:baseline;padding:24px 0;
+    border-top:1px solid rgba(255,255,255,.18)}
+  .hero-step:last-child{border-bottom:1px solid rgba(255,255,255,.18)}
+  .hero-step-num{font-family:var(--font-poppins),var(--font-inter),sans-serif;font-weight:700;
+    font-size:2.1rem;letter-spacing:-1px;min-width:56px}
+  /* dim -> bright so the sequence reads forward on a dark ground */
+  .hero-step:nth-child(1) .hero-step-num{color:#5B83B8}
+  .hero-step:nth-child(2) .hero-step-num{color:#5AA9DE}
+  .hero-step:nth-child(3) .hero-step-num{color:#93CDEC}
+  .hero-step-title{font-family:var(--font-poppins),var(--font-inter),sans-serif;font-weight:600;
+    font-size:1.25rem;color:#fff;letter-spacing:-.3px}
+  .hero-step-desc{font-size:.94rem;color:#9FB6D6;margin:7px 0 0;line-height:1.55}
 
   /* sections */
   main{background:#FFFFFF}
-  section{padding:56px 0;background:#FFFFFF;color:var(--ink);scroll-margin-top:80px}
-  .hero{background:#F9FCFE}
+  section{padding:56px 0;background:#FFFFFF;color:var(--ink);scroll-margin-top:140px}
+  .hero{background:var(--navy)}
   .band-tint{background:var(--tint)}
   .section-head{max-width:62ch;margin-bottom:34px}
   .section-head.center{margin-left:auto;margin-right:auto;text-align:center}
@@ -192,6 +232,7 @@
   .range-slider input[type="range"]:focus-visible::-moz-range-thumb{outline:2px solid var(--marigold-deep);outline-offset:2px}
   .range-slider-labels{display:flex;justify-content:space-between;font-size:.85rem;color:var(--slate);margin-top:2px}
   .field-note{font-size:.88rem;color:var(--slate);margin:6px 0 0}
+  .field-error{font-size:.88rem;color:#C2372F;font-weight:500;margin:6px 0 0}
 
   /* contact wizard */
   .wizard-step form{gap:14px}
@@ -228,9 +269,17 @@
   #sent{display:none;background:#EAF3FB;border:2px solid #2F80C2;border-radius:12px;padding:16px 18px;font-weight:600}
 
   /* footer */
-  footer{padding:40px 24px 48px;color:var(--slate);font-size:.93rem;background:var(--tint)}
-  .foot{max-width:var(--maxw);margin:0 auto;display:flex;flex-wrap:wrap;gap:18px 40px;justify-content:space-between}
-  footer a{text-decoration:none;font-weight:600;color:var(--ink)}
+  footer{padding:40px 24px 48px;color:#C3D2E8;font-size:.93rem;background:var(--navy)}
+  .foot{max-width:var(--maxw);margin:0 auto;display:grid;
+    grid-template-columns:1.7fr repeat(3, minmax(0, 1fr)) auto;gap:34px 36px;align-items:start}
+  .foot-brand{max-width:34ch}
+  .foot-brand p{margin:0 0 8px}
+  .foot-col{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+  .foot-heading{font-size:.72rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+    color:#8FA7C9;margin:0 0 2px}
+  footer a{text-decoration:none;font-weight:600;color:#EAF3FB}
+  footer .btn-ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.45)}
+  footer .btn-ghost:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.7)}
 
   /* motion */
   .reveal{opacity:0;transform:translateY(14px);transition:opacity .5s ease,transform .5s ease}
@@ -257,14 +306,15 @@
     .utility .u-right{gap:14px}
   }
   @media (max-width:960px){
-    .hero-grid{grid-template-columns:1fr;gap:34px}
-    .art-wrap{order:-1}
+    .hero-grid{grid-template-columns:1fr;gap:40px}
     .paths{grid-template-columns:1fr}
     .services{grid-template-columns:repeat(2,1fr)}
     .steps{grid-template-columns:repeat(2,1fr);gap:34px}
     .contact-grid{grid-template-columns:1fr;gap:34px}
     .jobs-grid{grid-template-columns:1fr;gap:28px}
     .partners{grid-template-columns:1fr}
+    .foot{grid-template-columns:repeat(2, minmax(0, 1fr))}
+    .foot-brand{grid-column:1 / -1}
   }
   @media (max-width:620px){
     body{font-size:18px}
@@ -275,8 +325,10 @@
     .bar .phone small{display:none}
     .brand .tag{display:none}
     .brand .name{font-size:1.3rem}
+    .brand .mark{width:34px}
     .btn{width:100%}
     .field-row{grid-template-columns:1fr}
+    .foot{grid-template-columns:1fr;gap:28px}
   }
 
 

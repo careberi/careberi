@@ -1,46 +1,76 @@
 import BerryMark from "./BerryMark";
 
+const serviceLinks = [
+  { href: "#approach", label: "Our Approach" },
+  { href: "#services", label: "Our Services" },
+  { href: "#probono", label: "Pro Bono Care" },
+];
+
+const companyLinks = [
+  { href: "#jobs", label: "Jobs" },
+  { href: "#partnerships", label: "Partnerships" },
+];
+
 export default function Footer() {
   return (
     <footer>
       <div className="foot">
-        <div>
-          <span style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 6 }}>
+        <div className="foot-brand">
+          <span style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 10 }}>
             <BerryMark style={{ width: 26, height: "auto", flex: "none" }} title="careberi" />
             <strong
               style={{
-                color: "var(--navy)",
+                color: "#EAF3FB",
                 fontSize: "1.15rem",
                 fontFamily: "var(--font-poppins), sans-serif",
                 fontWeight: 600,
               }}
             >
-              care<span style={{ color: "var(--marigold)" }}>beri</span>
+              care<span style={{ color: "#5AA9DE" }}>beri</span>
             </strong>
           </span>
-          Non-medical home care for seniors and adults with
-          <br />
-          disabilities across New Jersey
-          <br />
-          Licensed, bonded, and insured · NJ HCSA #0000000
+          <p style={{ margin: "0 0 8px" }}>
+            Non-medical home care for seniors and adults with disabilities across New
+            Jersey.
+          </p>
+          <p style={{ margin: 0 }}>Licensed, bonded, and insured · NJ HCSA #0000000</p>
         </div>
-        <div>
-          <a href="tel:+12012665450">(201) 266-5450</a>
-          <br />
+
+        <div className="foot-col">
+          <p className="foot-heading">Contact</p>
+          <a href="tel:+12012665450">201-266-5450</a>
           <a href="mailto:care@careberi.com">care@careberi.com</a>
-          <br />
-          Open 24/7
+          <span>Open 24/7</span>
         </div>
-        <div>
-          <a href="#approach">Our Approach</a> · <a href="#services">Our Services</a>
-          <br />
-          <a href="#probono">Pro Bono Care</a> · <a href="#jobs">Jobs</a> ·{" "}
-          <a href="#partnerships">Partnerships</a>
-          <br />
-          <a href="#">Family Portal</a> · <a href="#">Privacy</a>
-        </div>
-        <div>
-          <p style={{ marginBottom: 10 }}>Worked with us?</p>
+
+        <nav className="foot-col" aria-label="Services">
+          <p className="foot-heading">Services</p>
+          {serviceLinks.map((l) => (
+            <a key={l.label} href={l.href}>
+              {l.label}
+            </a>
+          ))}
+        </nav>
+
+        <nav className="foot-col" aria-label="Company">
+          <p className="foot-heading">Company</p>
+          {companyLinks.map((l) => (
+            <a key={l.label} href={l.href}>
+              {l.label}
+            </a>
+          ))}
+          <a
+            href="https://carebericp.caresmartz360.com"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Family Portal
+          </a>
+          <a href="#">Privacy</a>
+        </nav>
+
+        <div className="foot-col">
+          <p className="foot-heading">Worked with us?</p>
           <a className="btn btn-ghost" href="#" rel="noopener">
             Leave a review on Google
           </a>

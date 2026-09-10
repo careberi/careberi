@@ -2,7 +2,8 @@
 
 import { createClient } from "../../lib/supabase/server";
 
-const REASONS = new Set(["general", "probono", "partner", "employment"]);
+// Caregiver applications are handled by CareSmartz360, not this form.
+const REASONS = new Set(["general", "probono", "partner"]);
 const CARE_TYPES = new Set(["recurring", "one_time", "live_in"]);
 const RECIPIENTS = new Set(["parent", "spouse", "adult_child", "friend_relative", "myself"]);
 const GENDERS = new Set(["female", "male"]);
@@ -23,10 +24,21 @@ function isValidPhone(phone) {
   return /^[0-9]{10}$/.test(phone);
 }
 
-function isValidNjZip(zip) {
-  if (!/^[0-9]{5}$/.test(zip)) return false;
+function isValidZip(zip) {
+  return /^[0-9]{5}$/.test(zip);
+}
+
+function isNjZip(zip) {
+  if (!isValidZip(zip)) return false;
   const n = Number(zip);
   return n >= 7001 && n <= 8989;
+}
+
+// Care is only delivered in New Jersey, so care requests must be in-state.
+// Partners and job applicants may be anywhere.
+function isZipValidForReason(zip, reason) {
+  if (reason === "general" || reason === "probono") return isNjZip(zip);
+  return isValidZip(zip);
 }
 
 function cleanText(value) {
@@ -48,9 +60,9 @@ export async function submitContactForm(payload) {
     !phone ||
     !isValidPhone(phone) ||
     !zip ||
-    !isValidNjZip(zip) ||
     !reason ||
-    !REASONS.has(reason)
+    !REASONS.has(reason) ||
+    !isZipValidForReason(zip, reason)
   ) {
     return { success: false, error: "validation" };
   }
@@ -77,15 +89,12 @@ export async function submitContactForm(payload) {
       reason,
       town: cleanText(payload.town),
       story: cleanText(payload.story),
-      resume_path: cleanText(payload.resumePath),
       care_needs: careNeeds && careNeeds.length ? careNeeds : null,
       care_type: careType,
       start_date: payload.startDate || null,
       end_date: payload.endDate || null,
       time_start: payload.timeStart != null ? String(payload.timeStart) : null,
       time_end: payload.timeEnd != null ? String(payload.timeEnd) : null,
-      pay_min: payload.payMin ?? null,
-      pay_max: payload.payMax ?? null,
       care_recipient: careRecipient,
       recipient_gender: recipientGender,
       recipient_age_range: cleanText(payload.recipientAgeRange),

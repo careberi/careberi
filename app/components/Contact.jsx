@@ -4,13 +4,11 @@ import { useEffect, useState } from "react";
 import Reveal from "./Reveal";
 import RangeSlider from "./RangeSlider";
 import { submitContactForm } from "../actions/contact";
-import { createClient } from "../../lib/supabase/client";
 
 const REASONS = [
   { value: "general", label: "Learn more about our services" },
   { value: "probono", label: "Pro bono care (careberi care)" },
   { value: "partner", label: "Partnership inquiry" },
-  { value: "employment", label: "I'm looking for a caregiving job" },
 ];
 
 const CONFIRMATIONS = {
@@ -20,8 +18,6 @@ const CONFIRMATIONS = {
     "Sent. A care manager will review your careberi care request and follow up within a few days.",
   partner:
     "Sent. Our partnerships team will review this and reach out about working together.",
-  employment:
-    "Sent. Our hiring team will review your application and be in touch about next steps.",
 };
 
 const CARE_NEEDS_OPTIONS = [
@@ -62,10 +58,29 @@ function isValidEmail(email) {
   return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
 }
 
-function isValidNjZip(zip) {
-  if (!/^[0-9]{5}$/.test(zip)) return false;
+function isValidZip(zip) {
+  return /^[0-9]{5}$/.test(zip);
+}
+
+function isNjZip(zip) {
+  if (!isValidZip(zip)) return false;
   const n = Number(zip);
   return n >= 7001 && n <= 8989;
+}
+
+// Care is only delivered in New Jersey, so care requests must be in-state.
+// Partners and job applicants may be anywhere.
+function zipRequiresNj(reason) {
+  return reason === "general" || reason === "probono";
+}
+
+function zipError(zip, reason) {
+  if (!zip) return "Please enter your ZIP code.";
+  if (!isValidZip(zip)) return "Enter a 5-digit ZIP code.";
+  if (zipRequiresNj(reason) && !isNjZip(zip)) {
+    return "We provide care in New Jersey only. Enter an NJ ZIP code, or choose a different reason above.";
+  }
+  return null;
 }
 
 function formatHour(h) {
@@ -93,21 +108,6 @@ async function submitContactFormWithRetry(payload, attempts = 3) {
   return result;
 }
 
-async function uploadResumeWithRetry(supabase, resumeFile, attempts = 3) {
-  let lastError = null;
-  for (let i = 0; i < attempts; i++) {
-    // Unique path per attempt: if a prior attempt actually succeeded server-side
-    // but the response was lost to the network, a retry can't collide with it
-    // (the resumes bucket only allows INSERT, not overwrite).
-    const path = `${Date.now()}-${i}-${resumeFile.name}`;
-    const { error } = await supabase.storage.from("resumes").upload(path, resumeFile);
-    if (!error) return { path, error: null };
-    lastError = error;
-    if (i < attempts - 1) await sleep(500 * (i + 1));
-  }
-  return { path: null, error: lastError };
-}
-
 const initialFormData = {
   name: "",
   email: "",
@@ -120,8 +120,6 @@ const initialFormData = {
   endDate: "",
   timeStart: 9,
   timeEnd: 17,
-  payMin: 33,
-  payMax: 45,
   careRecipient: "",
   recipientGender: "female",
   recipientAgeRange: "",
@@ -135,12 +133,11 @@ export default function Contact() {
   const [formData, setFormData] = useState(initialFormData);
   const [stepId, setStepId] = useState("intro");
   const [history, setHistory] = useState([]);
-  const [errorFields, setErrorFields] = useState([]);
+  const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(false);
   const [sent, setSent] = useState(false);
   const [sentReason, setSentReason] = useState(null);
-  const [resumeFile, setResumeFile] = useState(null);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -165,7 +162,7 @@ export default function Contact() {
 
   function goNext(nextId) {
     setHistory((h) => [...h, stepId]);
-    setErrorFields([]);
+    setErrors({});
     setStepId(nextId);
   }
 
@@ -173,7 +170,7 @@ export default function Contact() {
     setHistory((h) => {
       const prev = h[h.length - 1];
       if (prev) {
-        setErrorFields([]);
+        setErrors({});
         setStepId(prev);
       }
       return h.slice(0, -1);
@@ -181,46 +178,56 @@ export default function Contact() {
   }
 
   function handleIntroNext() {
-    const invalid = [];
-    if (!formData.name.trim()) invalid.push("name");
-    if (!formData.email.trim() || !isValidEmail(formData.email.trim())) invalid.push("email");
-    const phoneDigits = formData.phone.replace(/\D/g, "");
-    if (phoneDigits.length !== 10) invalid.push("phone");
-    if (!isValidNjZip(formData.zip.trim())) invalid.push("zip");
-    if (!formData.reason) invalid.push("reason");
+    const found = {};
+    if (!formData.name.trim()) found.name = "Please enter your name.";
+    if (!formData.email.trim()) found.email = "Please enter your email address.";
+    else if (!isValidEmail(formData.email.trim()))
+      found.email = "That doesn't look like a valid email address.";
 
-    if (invalid.length > 0) {
-      setErrorFields(invalid);
+    const phoneDigits = formData.phone.replace(/\D/g, "");
+    if (!phoneDigits) found.phone = "Please enter your phone number.";
+    else if (phoneDigits.length !== 10)
+      found.phone = "Enter a 10-digit phone number, including the area code.";
+
+    const zipMsg = zipError(formData.zip.trim(), formData.reason);
+    if (zipMsg) found.zip = zipMsg;
+
+    if (!formData.reason) found.reason = "Please choose a reason so we can route your request.";
+
+    if (Object.keys(found).length > 0) {
+      setErrors(found);
       return;
     }
 
     if (formData.reason === "partner") goNext("partner-details");
-    else if (formData.reason === "employment") goNext("employment-details");
     else goNext("care-needs");
   }
 
   function handleCareNeedsNext() {
-    if (formData.careNeeds.length === 0) return setErrorFields(["care-needs"]);
+    if (formData.careNeeds.length === 0)
+      return setErrors({ "care-needs": "Choose at least one kind of help." });
     goNext("care-type");
   }
 
   function handleCareTypeNext() {
-    if (!formData.careType) return setErrorFields(["care-type"]);
+    if (!formData.careType)
+      return setErrors({ "care-type": "Choose the type of care you need." });
     goNext("schedule");
   }
 
   function handleScheduleNext() {
-    if (!formData.startDate) return setErrorFields(["startDate"]);
-    goNext(formData.reason === "general" ? "pay" : "recipient");
+    if (!formData.startDate)
+      return setErrors({ startDate: "Please choose an estimated start date." });
+    goNext("recipient");
   }
 
   function handleRecipientNext() {
-    const invalid = [];
-    if (!formData.careRecipient) invalid.push("careRecipient");
-    if (!formData.recipientAgeRange) invalid.push("recipientAgeRange");
+    const found = {};
+    if (!formData.careRecipient) found.careRecipient = "Please choose who needs care.";
+    if (!formData.recipientAgeRange) found.recipientAgeRange = "Please choose an age range.";
 
-    if (invalid.length > 0) {
-      setErrorFields(invalid);
+    if (Object.keys(found).length > 0) {
+      setErrors(found);
       return;
     }
     goNext("caregiver-prefs");
@@ -229,18 +236,6 @@ export default function Contact() {
   async function finalizeAndSubmit(extra) {
     setSubmitting(true);
     setSubmitError(false);
-
-    let resumePath = null;
-    if (formData.reason === "employment" && resumeFile) {
-      const supabase = createClient();
-      const { path, error: uploadError } = await uploadResumeWithRetry(supabase, resumeFile);
-      if (uploadError) {
-        setSubmitting(false);
-        setSubmitError(true);
-        return;
-      }
-      resumePath = path;
-    }
 
     const phoneDigits = formData.phone.replace(/\D/g, "");
 
@@ -252,15 +247,12 @@ export default function Contact() {
       reason: formData.reason,
       town: formData.town || null,
       story: formData.story || null,
-      resumePath,
       careNeeds: formData.careNeeds.length ? formData.careNeeds : null,
       careType: formData.careType || null,
       startDate: formData.startDate || null,
       endDate: formData.endDate || null,
       timeStart: formData.timeStart,
       timeEnd: formData.timeEnd,
-      payMin: formData.reason === "general" ? formData.payMin : null,
-      payMax: formData.reason === "general" ? formData.payMax : null,
       careRecipient: formData.careRecipient || null,
       recipientGender: formData.recipientGender || null,
       recipientAgeRange: formData.recipientAgeRange || null,
@@ -282,12 +274,8 @@ export default function Contact() {
 
   function handlePartnerSubmit(e) {
     e.preventDefault();
-    if (!formData.town.trim()) return setErrorFields(["town"]);
-    finalizeAndSubmit({});
-  }
-
-  function handleEmploymentSubmit(e) {
-    e.preventDefault();
+    if (!formData.town.trim())
+      return setErrors({ town: "Please enter your company or organization name." });
     finalizeAndSubmit({});
   }
 
@@ -296,7 +284,16 @@ export default function Contact() {
     finalizeAndSubmit({});
   }
 
-  const errStyle = (id) => (errorFields.includes(id) ? { borderColor: "#C2372F" } : undefined);
+  const errStyle = (id) => (errors[id] ? { borderColor: "#C2372F" } : undefined);
+
+  function FieldError({ id }) {
+    if (!errors[id]) return null;
+    return (
+      <p className="field-error" role="alert">
+        {errors[id]}
+      </p>
+    );
+  }
 
   function StepNav({ onBack, nextLabel = "Next", showBack = true }) {
     return (
@@ -332,7 +329,9 @@ export default function Contact() {
               value={formData.name}
               onChange={(e) => set("name", e.target.value)}
               style={errStyle("name")}
+              aria-invalid={!!errors.name}
             />
+            <FieldError id="name" />
           </div>
           <div>
             <label htmlFor="email">Your email</label>
@@ -343,7 +342,9 @@ export default function Contact() {
               value={formData.email}
               onChange={(e) => set("email", e.target.value)}
               style={errStyle("email")}
+              aria-invalid={!!errors.email}
             />
+            <FieldError id="email" />
           </div>
         </div>
         <div className="field-row">
@@ -356,10 +357,14 @@ export default function Contact() {
               value={formData.phone}
               onChange={(e) => set("phone", e.target.value)}
               style={errStyle("phone")}
+              aria-invalid={!!errors.phone}
             />
+            <FieldError id="phone" />
           </div>
           <div>
-            <label htmlFor="zip">ZIP code</label>
+            <label htmlFor="zip">
+              ZIP code{zipRequiresNj(formData.reason) ? " (New Jersey)" : ""}
+            </label>
             <input
               id="zip"
               type="text"
@@ -368,7 +373,9 @@ export default function Contact() {
               value={formData.zip}
               onChange={(e) => set("zip", e.target.value)}
               style={errStyle("zip")}
+              aria-invalid={!!errors.zip}
             />
+            <FieldError id="zip" />
           </div>
         </div>
         <div>
@@ -378,6 +385,7 @@ export default function Contact() {
             value={formData.reason}
             onChange={(e) => set("reason", e.target.value)}
             style={errStyle("reason")}
+            aria-invalid={!!errors.reason}
           >
             <option value="" disabled>
               Choose a reason
@@ -388,6 +396,7 @@ export default function Contact() {
               </option>
             ))}
           </select>
+          <FieldError id="reason" />
         </div>
         <button className="btn btn-primary" type="submit">
           Next
@@ -408,7 +417,8 @@ export default function Contact() {
       >
         <h3>What kind of help are you looking for?</h3>
         <p className="wizard-sub">Choose all that apply.</p>
-        <div className="choice-cards" style={errorFields.includes("care-needs") ? { outline: "2px solid #C2372F", borderRadius: 14 } : undefined}>
+        <FieldError id="care-needs" />
+        <div className="choice-cards" style={errors["care-needs"] ? { outline: "2px solid #C2372F", borderRadius: 14 } : undefined}>
           {CARE_NEEDS_OPTIONS.map((opt) => {
             const selected = formData.careNeeds.includes(opt.value);
             return (
@@ -444,9 +454,10 @@ export default function Contact() {
         }}
       >
         <h3>What type of care are you looking for?</h3>
+        <FieldError id="care-type" />
         <div
           className="pill-group"
-          style={{ marginBottom: 24, ...(errorFields.includes("care-type") ? { outline: "2px solid #C2372F", borderRadius: 999, padding: 4 } : {}) }}
+          style={{ marginBottom: 24, ...(errors["care-type"] ? { outline: "2px solid #C2372F", borderRadius: 999, padding: 4 } : {}) }}
         >
           {CARE_TYPE_OPTIONS.map((opt) => (
             <button
@@ -483,7 +494,9 @@ export default function Contact() {
               value={formData.startDate}
               onChange={(e) => set("startDate", e.target.value)}
               style={errStyle("startDate")}
+              aria-invalid={!!errors.startDate}
             />
+            <FieldError id="startDate" />
           </div>
           <div>
             <label htmlFor="endDate">Estimated end date (optional)</label>
@@ -519,38 +532,6 @@ export default function Contact() {
     );
   }
 
-  function renderPay() {
-    return (
-      <form
-        noValidate
-        onSubmit={(e) => {
-          e.preventDefault();
-          goNext("recipient");
-        }}
-      >
-        <h3>What would you like to pay for care?</h3>
-        <p className="wizard-sub">The average range in your area is $33–$45/hr.</p>
-        <div className="wizard-field">
-          <p style={{ fontSize: "1.4rem", fontWeight: 800, marginBottom: 4 }}>
-            ${formData.payMin}–{formData.payMax} <span style={{ fontSize: ".95rem", color: "var(--slate)", fontWeight: 500 }}>/hr</span>
-          </p>
-          <RangeSlider
-            min={20}
-            max={60}
-            step={1}
-            valueMin={formData.payMin}
-            valueMax={formData.payMax}
-            onChange={(lo, hi) => {
-              set("payMin", lo);
-              set("payMax", hi);
-            }}
-          />
-        </div>
-        <StepNav />
-      </form>
-    );
-  }
-
   function renderRecipient() {
     return (
       <form
@@ -577,11 +558,7 @@ export default function Contact() {
               </label>
             ))}
           </div>
-          {errorFields.includes("careRecipient") && (
-            <p role="alert" style={{ color: "#C2372F", fontSize: ".9rem" }}>
-              Please choose one.
-            </p>
-          )}
+          <FieldError id="careRecipient" />
         </div>
         <div className="wizard-field">
           <label>Gender</label>
@@ -619,6 +596,7 @@ export default function Contact() {
               </option>
             ))}
           </select>
+          <FieldError id="recipientAgeRange" />
         </div>
         <div>
           <label htmlFor="recipientNotes">What should we know about them?</label>
@@ -654,7 +632,7 @@ export default function Contact() {
         {submitError && (
           <p role="alert" style={{ color: "#C2372F" }}>
             Something went wrong sending your request. Please call us instead at{" "}
-            <a href="tel:+12012665450">(201) 266-5450</a>.
+            <a href="tel:+12012665450">201-266-5450</a>.
           </p>
         )}
       </form>
@@ -673,7 +651,9 @@ export default function Contact() {
             value={formData.town}
             onChange={(e) => set("town", e.target.value)}
             style={errStyle("town")}
+            aria-invalid={!!errors.town}
           />
+          <FieldError id="town" />
         </div>
         <div>
           <label htmlFor="story">What&apos;s going on?</label>
@@ -689,32 +669,7 @@ export default function Contact() {
         {submitError && (
           <p role="alert" style={{ color: "#C2372F" }}>
             Something went wrong sending your request. Please call us instead at{" "}
-            <a href="tel:+12012665450">(201) 266-5450</a>.
-          </p>
-        )}
-      </form>
-    );
-  }
-
-  function renderEmploymentDetails() {
-    return (
-      <form noValidate onSubmit={handleEmploymentSubmit}>
-        <h3>Almost done</h3>
-        <div>
-          <label htmlFor="resume">Resume (optional)</label>
-          <input
-            id="resume"
-            type="file"
-            accept=".pdf,.doc,.docx"
-            onChange={(e) => setResumeFile(e.target.files?.[0] ?? null)}
-          />
-        </div>
-        <StepNav nextLabel="Submit" />
-        <p className="field-note">We never sell or share your information.</p>
-        {submitError && (
-          <p role="alert" style={{ color: "#C2372F" }}>
-            Something went wrong sending your request. Please call us instead at{" "}
-            <a href="tel:+12012665450">(201) 266-5450</a>.
+            <a href="tel:+12012665450">201-266-5450</a>.
           </p>
         )}
       </form>
@@ -731,16 +686,12 @@ export default function Contact() {
         return renderCareType();
       case "schedule":
         return renderSchedule();
-      case "pay":
-        return renderPay();
       case "recipient":
         return renderRecipient();
       case "caregiver-prefs":
         return renderCaregiverPrefs();
       case "partner-details":
         return renderPartnerDetails();
-      case "employment-details":
-        return renderEmploymentDetails();
       default:
         return renderIntro();
     }
@@ -751,7 +702,7 @@ export default function Contact() {
       <div className="wrap">
         <div className="contact-grid">
           <div>
-            <p className="eyebrow">Free home visit</p>
+            <p className="eyebrow">Home visit</p>
             <h2>
               Tell us about <span className="hl">your loved one</span>
             </h2>
@@ -764,7 +715,7 @@ export default function Contact() {
                 <strong>Would rather just talk?</strong>
               </p>
               <a className="big-phone" href="tel:+12012665450">
-                (201) 266-5450
+                201-266-5450
               </a>
               <p style={{ fontSize: ".95rem", color: "var(--slate)" }}>
                 A person answers 24/7, every day of the year.

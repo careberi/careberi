@@ -24,7 +24,12 @@ export default function Jobs() {
               respects the work.
             </p>
             <div className="jobs-cta">
-              <a className="btn btn-primary" href="/?reason=employment#contact">
+              <a
+                className="btn btn-primary"
+                href="https://careberi.caresmartz360.com/v2/caregiver-applicant-form"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 Apply now
               </a>
               <a className="btn btn-ghost" href="tel:+12012665450">

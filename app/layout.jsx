@@ -19,7 +19,7 @@ export const metadata = {
   metadataBase: new URL("https://www.careberi.com"),
   title: "Non-Medical Home Care in New Jersey | careberi — Senior & Disability Care",
   description:
-    "careberi provides non-medical home care in New Jersey for seniors and people with disabilities. Trained, background-checked caregivers help with bathing, meals, medication reminders, and companionship at home. Free in-home assessment — call (201) 266-5450.",
+    "careberi provides non-medical home care in New Jersey for seniors and people with disabilities. Trained, background-checked caregivers help with bathing, meals, medication reminders, and companionship at home. In-home assessment — call 201-266-5450.",
   keywords: [
     "home care New Jersey",
     "non-medical home care NJ",
@@ -38,7 +38,7 @@ export const metadata = {
     type: "website",
     title: "Non-Medical Home Care in New Jersey | careberi",
     description:
-      "Compassionate, non-medical home care for New Jersey seniors and people with disabilities. Free in-home assessment.",
+      "Compassionate, non-medical home care for New Jersey seniors and people with disabilities. In-home assessment and a written care plan.",
     url: "https://www.careberi.com/",
     siteName: "careberi",
   },

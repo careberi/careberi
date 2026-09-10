@@ -4,10 +4,15 @@ export default function UtilityBar() {
       <div className="wrap">
         <div className="u-left">
           To get care today, call or text{" "}
-          <a href="tel:+12012665450">(201) 266-5450</a>
+          <a href="tel:+12012665450">201-266-5450</a>
         </div>
         <div className="u-right">
-          <a className="portal" href="#" rel="noopener">
+          <a
+            className="portal"
+            href="https://carebericp.caresmartz360.com"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             Family Portal
           </a>
           <a href="#contact">Contact</a>
