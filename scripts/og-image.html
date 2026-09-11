@@ -1,0 +1,68 @@
+<!doctype html>
+<!-- Source for app/opengraph-image.png (1200x630). Regenerate: node scripts/generate-og-image.mjs -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400&family=Poppins:wght@500;600;700&display=block" rel="stylesheet">
+<style>
+  html, body { margin: 0; background: #16265c; }
+  body { width: 1200px; height: 630px; overflow: hidden; color: #fff; font-family: Poppins, system-ui, sans-serif; }
+  .card { position: relative; box-sizing: border-box; width: 1200px; height: 630px; padding: 68px 80px 62px;
+    display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; }
+  .watermark { position: absolute; right: -60px; bottom: -96px; width: 440px; opacity: .09; }
+
+  /* Reversed logo lockup: the nav spec scaled from a 32px wordmark to 58px */
+  .logo { display: inline-flex; align-items: center; gap: 20px; line-height: 1; }
+  .logo svg { width: 84px; height: auto; flex: 0 0 auto; }
+  .word { display: block; font-weight: 600; font-size: 58px; letter-spacing: -1.7px; white-space: nowrap; }
+  .word b { font-weight: 600; color: #eaf3fb; }
+  .word i { font-style: normal; color: #5aa9de; }
+  .tag { display: block; margin-top: 7px; font-weight: 500; font-size: 14.5px; text-transform: uppercase;
+    color: #9fb6d6; white-space: nowrap; }
+
+  h1 { margin: 0; font-weight: 700; font-size: 68px; line-height: 1.04; letter-spacing: -2.2px; max-width: 900px; }
+  h1 span { color: #93cdec; }
+  .sub { margin: 22px 0 0; font-family: Inter, system-ui, sans-serif; font-size: 30px; line-height: 1.35; color: #c3d6ea; }
+
+  .foot { display: flex; align-items: center; gap: 22px; }
+  .phone { font-weight: 600; font-size: 34px; letter-spacing: -.5px; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: #5aa9de; }
+  .url { font-weight: 500; font-size: 26px; color: #9fb6d6; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <svg class="watermark" viewBox="0 0 240 300" aria-hidden="true"><g stroke="#16265c" stroke-width="3"><path d="M138 104 Q96 98 68 42 Q118 62 138 104 Z" fill="#5aa9de" stroke-width="2.5"/><path d="M142 104 Q184 98 212 42 Q162 62 142 104 Z" fill="#93cdec" stroke-width="2.5"/><circle cx="117" cy="120" r="24" fill="#5aa9de"/><circle cx="165" cy="120" r="24" fill="#2a5d9f"/><circle cx="93" cy="158" r="24" fill="#2f80c2"/><circle cx="141" cy="158" r="24" fill="#16265c"/><circle cx="189" cy="158" r="24" fill="#5aa9de"/><circle cx="93" cy="196" r="24" fill="#2a5d9f"/><circle cx="141" cy="196" r="24" fill="#2f80c2"/><circle cx="189" cy="196" r="24" fill="#16265c"/><circle cx="117" cy="234" r="24" fill="#16265c"/><circle cx="165" cy="234" r="24" fill="#2f80c2"/><circle cx="141" cy="272" r="24" fill="#2a5d9f"/></g></svg>
+    <div class="logo">
+      <svg viewBox="0 0 240 300" aria-hidden="true"><g stroke="#16265c" stroke-width="3"><path d="M138 104 Q96 98 68 42 Q118 62 138 104 Z" fill="#5aa9de" stroke-width="2.5"/><path d="M142 104 Q184 98 212 42 Q162 62 142 104 Z" fill="#93cdec" stroke-width="2.5"/><circle cx="117" cy="120" r="24" fill="#5aa9de"/><circle cx="165" cy="120" r="24" fill="#2a5d9f"/><circle cx="93" cy="158" r="24" fill="#2f80c2"/><circle cx="141" cy="158" r="24" fill="#16265c"/><circle cx="189" cy="158" r="24" fill="#5aa9de"/><circle cx="93" cy="196" r="24" fill="#2a5d9f"/><circle cx="141" cy="196" r="24" fill="#2f80c2"/><circle cx="189" cy="196" r="24" fill="#16265c"/><circle cx="117" cy="234" r="24" fill="#16265c"/><circle cx="165" cy="234" r="24" fill="#2f80c2"/><circle cx="141" cy="272" r="24" fill="#2a5d9f"/></g></svg>
+      <span>
+        <span class="word"><b>care</b><i>beri</i></span>
+        <span class="tag">Home Health &amp; Home Care</span>
+      </span>
+    </div>
+    <div>
+      <h1>Non-medical home care across <span>New Jersey</span></h1>
+      <p class="sub">A home visit, a written care plan, and no long-term contract.</p>
+    </div>
+    <div class="foot">
+      <span class="phone">201-266-5450</span>
+      <span class="dot"></span>
+      <span class="url">careberi.com</span>
+    </div>
+  </div>
+  <script>
+    // Same fit as Header.jsx: track the tagline so it sits flush with the wordmark.
+    function textWidth(el) { var r = document.createRange(); r.selectNodeContents(el); return r.getBoundingClientRect().width; }
+    function fit() {
+      var word = document.querySelector(".word"), tag = document.querySelector(".tag");
+      tag.style.letterSpacing = "normal"; tag.style.marginRight = "0px";
+      var wordLS = parseFloat(getComputedStyle(word).letterSpacing) || 0;
+      var target = textWidth(word) - wordLS, base = textWidth(tag), n = tag.textContent.trim().length;
+      var ls = (target - base) / (n - 1);
+      tag.style.letterSpacing = ls.toFixed(3) + "px"; tag.style.marginRight = (-ls).toFixed(3) + "px";
+    }
+    document.fonts.ready.then(fit);
+  </script>
+</body>
+</html>

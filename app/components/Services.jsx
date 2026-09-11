@@ -1,6 +1,6 @@
 import Reveal from "./Reveal";
 
-const services = [
+export const services = [
   {
     title: "Personal care",
     body: "Bathing, dressing, grooming, and getting safely to the bathroom — with dignity intact.",
@@ -77,6 +77,10 @@ export default function Services() {
             Personal care, companionship, and support for seniors and adults with
             disabilities — built around what your loved one actually needs. Mix and
             match; the plan changes as they do.
+          </p>
+          <p className="scope-note">
+            careberi provides non-medical care today. Home health services — skilled
+            nursing and therapy — are planned for the future.
           </p>
         </div>
         <div className="services">

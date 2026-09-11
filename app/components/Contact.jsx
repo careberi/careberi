@@ -13,7 +13,7 @@ const REASONS = [
 
 const CONFIRMATIONS = {
   general:
-    "Sent. A care manager will call you at the number you gave us — usually within the hour.",
+    "Sent. A care manager will call you at the number you gave us — we aim to call within the hour.",
   probono:
     "Sent. A care manager will review your careberi care request and follow up within a few days.",
   partner:
@@ -707,8 +707,8 @@ export default function Contact() {
               Tell us about <span className="hl">your loved one</span>
             </h2>
             <p className="lede">
-              Send this and a care manager calls you back the same day — usually within
-              an hour. No obligation, and no one will show up at the door unannounced.
+              Send this and a care manager calls you back the same day — we aim for
+              within the hour. No obligation, and no one will show up at the door unannounced.
             </p>
             <div className="callout">
               <p style={{ marginBottom: 2 }}>

@@ -31,9 +31,9 @@ export default function Footer() {
           </span>
           <p style={{ margin: "0 0 8px" }}>
             Non-medical home care for seniors and adults with disabilities across New
-            Jersey.
+            Jersey. Home health services are planned for the future.
           </p>
-          <p style={{ margin: 0 }}>Licensed, bonded, and insured · NJ HCSA #0000000</p>
+          <p style={{ margin: 0 }}>Pre-licensed, bonded, and insured</p>
         </div>
 
         <div className="foot-col">
@@ -66,7 +66,6 @@ export default function Footer() {
           >
             Family Portal
           </a>
-          <a href="#">Privacy</a>
         </nav>
 
         <div className="foot-col">

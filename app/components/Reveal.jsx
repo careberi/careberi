@@ -7,6 +7,8 @@ export default function Reveal({ as = "section", className = "", children, ...re
   const [shown, setShown] = useState(false);
 
   useEffect(() => {
+    // Tells the gate script in layout.jsx the app loaded, so it keeps sections hidden until scrolled to.
+    window.__revealReady = true;
     const el = ref.current;
     if (!el) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;

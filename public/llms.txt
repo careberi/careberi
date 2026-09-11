@@ -1,0 +1,21 @@
+# careberi
+
+> careberi is a pre-licensed, non-medical home care agency serving seniors and adults with disabilities across New Jersey. It does not currently provide home health (skilled medical) care; home health services are planned for the future.
+
+## Key facts
+
+- Services: personal care (bathing, dressing, grooming), meals and housekeeping, medication reminders, rides and errands, companionship, memory care, 24-hour care, and respite care for family caregivers.
+- Service area: New Jersey.
+- Rates: $36–$50 per hour depending on the level of help and the time of day, with no minimum per visit (as of September 2026).
+- How care starts: a home visit, a written care plan, and no long-term contract.
+- Payment: Medicare does not pay for non-medical home care, so most families pay privately. careberi helps families file long-term care insurance claims.
+- Pro bono program ("careberi care"): free caregiving hours each month for New Jersey seniors and adults with disabilities in financial hardship. Anyone can apply or nominate someone.
+- Contact: 201-266-5450 (answered 24/7), care@careberi.com.
+
+## Links
+
+- [Home](https://www.careberi.com/): services, how care starts, frequently asked questions, and the care request form
+- [Request care](https://www.careberi.com/?reason=general#contact)
+- [Pro bono care program](https://www.careberi.com/#probono)
+- [Caregiver jobs](https://www.careberi.com/#jobs): apply at https://careberi.caresmartz360.com/v2/caregiver-applicant-form
+- [Family portal](https://carebericp.caresmartz360.com)
