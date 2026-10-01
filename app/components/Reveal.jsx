@@ -25,7 +25,9 @@ export default function Reveal({ as = "section", className = "", children, ...re
           }
         });
       },
-      { threshold: 0.1 }
+      // Fire as a section's top edge clears the bottom of the screen. A visibility ratio
+      // left tall sections (the FAQ on a phone) blank until well past their top.
+      { threshold: 0, rootMargin: "0px 0px -8% 0px" }
     );
     io.observe(el);
     return () => io.disconnect();

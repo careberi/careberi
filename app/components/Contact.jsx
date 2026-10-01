@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Reveal from "./Reveal";
 import RangeSlider from "./RangeSlider";
 import { submitContactForm } from "../actions/contact";
@@ -108,6 +108,18 @@ async function submitContactFormWithRetry(payload, attempts = 3) {
   return result;
 }
 
+// The two routes through the wizard, in order, so a step can say where it sits.
+// Partners skip the care questions entirely; everyone else answers the full set.
+const PARTNER_FLOW = ["intro", "partner-details"];
+const CARE_FLOW = [
+  "intro",
+  "care-needs",
+  "care-type",
+  "schedule",
+  "recipient",
+  "caregiver-prefs",
+];
+
 const initialFormData = {
   name: "",
   email: "",
@@ -138,6 +150,24 @@ export default function Contact() {
   const [submitError, setSubmitError] = useState(false);
   const [sent, setSent] = useState(false);
   const [sentReason, setSentReason] = useState(null);
+  const [direction, setDirection] = useState(1);
+  const stepRef = useRef(null);
+  const isFirstStep = useRef(true);
+
+  // A step change swaps the whole form out, so move focus to the new step —
+  // otherwise keyboard and screen reader users are dropped back at the top of the page.
+  useEffect(() => {
+    if (isFirstStep.current) {
+      isFirstStep.current = false;
+      return;
+    }
+    const el = stepRef.current;
+    if (!el) return;
+    el.focus({ preventScroll: true });
+    // Only scroll when the new step starts behind the sticky bar; otherwise leave the
+    // page where the user left it.
+    if (el.getBoundingClientRect().top < 150) el.scrollIntoView({ block: "start" });
+  }, [stepId]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -146,6 +176,36 @@ export default function Contact() {
       set("reason", requested);
     }
   }, []);
+
+  // CTAs across the page link to "/?reason=…#contact". Followed as written, that is a
+  // full page reload; handle it in place instead — pick the reason, then let the hash
+  // change scroll and move focus the way a normal in-page link does.
+  useEffect(() => {
+    function onClick(e) {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const link = e.target.closest?.("a[href]");
+      if (!link || link.target) return;
+      const url = new URL(link.href, window.location.href);
+      if (
+        url.origin !== window.location.origin ||
+        url.pathname !== window.location.pathname ||
+        url.hash !== "#contact" ||
+        !url.searchParams.has("reason")
+      )
+        return;
+
+      e.preventDefault();
+      const requested = url.searchParams.get("reason");
+      // Only steer a form nobody has started; never throw away answers already given.
+      if (stepId === "intro" && !sent && REASONS.some((r) => r.value === requested)) {
+        set("reason", requested);
+      }
+      window.history.replaceState(window.history.state, "", url.pathname + url.search);
+      window.location.hash = "contact";
+    }
+    document.addEventListener("click", onClick);
+    return () => document.removeEventListener("click", onClick);
+  }, [stepId, sent]);
 
   function set(field, value) {
     setFormData((f) => ({ ...f, [field]: value }));
@@ -163,6 +223,7 @@ export default function Contact() {
   function goNext(nextId) {
     setHistory((h) => [...h, stepId]);
     setErrors({});
+    setDirection(1);
     setStepId(nextId);
   }
 
@@ -171,6 +232,7 @@ export default function Contact() {
       const prev = h[h.length - 1];
       if (prev) {
         setErrors({});
+        setDirection(-1);
         setStepId(prev);
       }
       return h.slice(0, -1);
@@ -697,8 +759,13 @@ export default function Contact() {
     }
   }
 
+  // Before a reason is picked the care flow is the assumed route, since it is the common one.
+  const flow = formData.reason === "partner" ? PARTNER_FLOW : CARE_FLOW;
+  const totalSteps = flow.length;
+  const stepNumber = flow.indexOf(stepId) + 1;
+
   return (
-    <Reveal id="contact">
+    <Reveal id="contact" className="band-tint">
       <div className="wrap">
         <div className="contact-grid">
           <div>
@@ -730,8 +797,32 @@ export default function Contact() {
               </p>
             </div>
           ) : (
-            <div id="care-form" className="wizard-step">
-              {renderStep()}
+            <div>
+              {stepNumber > 0 && (
+                <div className="wizard-progress">
+                  <div className="wizard-progress-track">
+                    <div
+                      className="wizard-progress-fill"
+                      style={{ transform: `scaleX(${stepNumber / totalSteps})` }}
+                    />
+                  </div>
+                  <p className="wizard-progress-label">
+                    Step {stepNumber} of {totalSteps}
+                  </p>
+                </div>
+              )}
+              {/* key remounts the step so the enter animation replays on every change */}
+              <div
+                id="care-form"
+                key={stepId}
+                ref={stepRef}
+                tabIndex={-1}
+                role="group"
+                aria-label={stepNumber > 0 ? `Step ${stepNumber} of ${totalSteps}` : undefined}
+                className={`wizard-step ${direction < 0 ? "step-in-back" : "step-in-next"}`}
+              >
+                {renderStep()}
+              </div>
             </div>
           )}
         </div>

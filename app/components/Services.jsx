@@ -79,8 +79,21 @@ export default function Services() {
             match; the plan changes as they do.
           </p>
           <p className="scope-note">
-            careberi provides non-medical care today. Home health services — skilled
-            nursing and therapy — are planned for the future.
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="9" />
+              <path d="M12 11v5M12 8h.01" />
+            </svg>
+            <span>
+              careberi provides non-medical care today. Home health services are planned
+              for the future.
+            </span>
           </p>
         </div>
         <div className="services">

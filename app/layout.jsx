@@ -50,6 +50,12 @@ export const metadata = {
   twitter: { card: "summary_large_image" },
 };
 
+// Browser chrome takes the color at the very top of the page: the navy utility strip.
+export const viewport = {
+  themeColor: "#0F1B3D",
+  colorScheme: "only light",
+};
+
 const ORG_ID = `${SITE_URL}/#organization`;
 const NEW_JERSEY = { "@type": "State", name: "New Jersey" };
 

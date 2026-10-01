@@ -31,16 +31,16 @@ const partners = [
 
 export default function Partnerships() {
   return (
-    <Reveal id="partnerships">
+    <Reveal id="partnerships" className="band-tint">
       <div className="wrap">
         <div className="section-head center">
           <p className="eyebrow">For referral partners</p>
           <h2>
             Partner with <span className="hl">careberi</span>
           </h2>
-          <p className="lede" style={{ marginLeft: "auto", marginRight: "auto" }}>
-            We work alongside New Jersey hospitals, skilled nursing facilities, case
-            managers, and senior communities to get patients home safely and keep them
+          <p className="lede">
+            We work alongside New Jersey hospitals, case managers, and senior
+            communities to get patients home safely and keep them
             there.
           </p>
         </div>

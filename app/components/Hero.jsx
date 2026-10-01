@@ -18,7 +18,7 @@ const steps = [
 
 export default function Hero() {
   return (
-    <section className="hero" id="approach">
+    <section className="hero">
       <div className="wrap hero-grid">
         <div className="hero-copy">
           <p className="eyebrow">Non-medical home care · New Jersey</p>
@@ -42,7 +42,19 @@ export default function Hero() {
             </a>
           </div>
           <ul className="assure">
-            <li>No long-term contract</li>
+            <li>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M20 6L9 17l-5-5" />
+              </svg>
+              No long-term contract
+            </li>
           </ul>
         </div>
 

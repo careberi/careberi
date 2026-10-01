@@ -1,6 +1,6 @@
 # careberi
 
-> careberi is a pre-licensed, non-medical home care agency serving seniors and adults with disabilities across New Jersey. It does not currently provide home health (skilled medical) care; home health services are planned for the future.
+> careberi is a pre-licensed, non-medical home care agency serving seniors and adults with disabilities across New Jersey. It does not currently provide home health (medical) care; home health services are planned for the future.
 
 ## Key facts
 

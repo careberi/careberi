@@ -17,21 +17,26 @@ const paths = [
 
 export default function Approach() {
   return (
-    <Reveal id="start" className="band-tint">
-      <div className="wrap">
-        <p className="eyebrow">Start here</p>
-        <h2>
-          Where are you <span className="hl-leaf">right now?</span>
-        </h2>
-        <p className="lede">
-          Families call us at three different moments. Pick the one that sounds like
-          yours and we&apos;ll tell you what to do first — even if you never hire us.
-        </p>
+    <Reveal id="approach" className="band-tint">
+      <div className="wrap approach-grid">
+        <div>
+          <p className="eyebrow">Start here</p>
+          <h2>
+            Where are you <span className="hl-leaf">right now?</span>
+          </h2>
+          <p className="lede">
+            Families call us at three different moments. Pick the one that sounds like
+            yours and we&apos;ll tell you what to do first — even if you never hire us.
+          </p>
+        </div>
 
         <div className="paths">
           {paths.map((p) => (
             <details className="path" key={p.q}>
-              <summary>{p.q}</summary>
+              <summary>
+                <span className="path-q">{p.q}</span>
+                <span className="pm" aria-hidden="true" />
+              </summary>
               <div className="body">
                 <p>
                   <strong>What we&apos;d do first</strong>

@@ -18,16 +18,18 @@ export default function Home() {
         <UtilityBar />
         <Header />
       </div>
+      {/* A family's path runs unbroken from the hero to the care request; the
+          sections for caregivers and referral partners follow it. */}
       <main id="top">
         <Hero />
         <Approach />
         <Services />
         <Steps />
         <ProBono />
-        <Jobs />
-        <Partnerships />
         <Faq />
         <Contact />
+        <Jobs />
+        <Partnerships />
       </main>
       <Footer />
     </>

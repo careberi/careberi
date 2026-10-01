@@ -25,7 +25,7 @@ const steps = [
 
 export default function Steps() {
   return (
-    <Reveal>
+    <Reveal className="band-tint">
       <div className="wrap">
         <div className="section-head">
           <p className="eyebrow">How it works</p>
@@ -34,15 +34,15 @@ export default function Steps() {
             <span className="hl">exactly what care costs</span>
           </h2>
         </div>
-        <div className="steps">
+        <ol className="steps">
           {steps.map((s) => (
-            <div className="step" key={s.title}>
+            <li className="step" key={s.title}>
               <p className="when">{s.when}</p>
               <h3>{s.title}</h3>
               <p>{s.body}</p>
-            </div>
+            </li>
           ))}
-        </div>
+        </ol>
       </div>
     </Reveal>
   );

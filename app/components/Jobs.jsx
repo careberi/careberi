@@ -9,7 +9,7 @@ const perks = [
 
 export default function Jobs() {
   return (
-    <Reveal className="band-tint" id="jobs">
+    <Reveal id="jobs">
       <div className="wrap">
         <div className="jobs-grid">
           <div>

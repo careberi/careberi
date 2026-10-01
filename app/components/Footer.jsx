@@ -16,20 +16,13 @@ export default function Footer() {
     <footer>
       <div className="foot">
         <div className="foot-brand">
-          <span style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 10 }}>
-            <BerryMark style={{ width: 26, height: "auto", flex: "none" }} title="careberi" />
-            <strong
-              style={{
-                color: "#EAF3FB",
-                fontSize: "1.15rem",
-                fontFamily: "var(--font-poppins), sans-serif",
-                fontWeight: 600,
-              }}
-            >
-              care<span style={{ color: "#5AA9DE" }}>beri</span>
+          <span className="foot-logo">
+            <BerryMark title="careberi" />
+            <strong>
+              care<span>beri</span>
             </strong>
           </span>
-          <p style={{ margin: "0 0 8px" }}>
+          <p>
             Non-medical home care for seniors and adults with disabilities across New
             Jersey. Home health services are planned for the future.
           </p>
@@ -74,6 +67,24 @@ export default function Footer() {
             Leave a review on Google
           </a>
         </div>
+      </div>
+
+      <div className="foot-base">
+        <p>© {new Date().getFullYear()} careberi</p>
+        <a href="#top">
+          Back to top
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M12 19V5M5 12l7-7 7 7" />
+          </svg>
+        </a>
       </div>
     </footer>
   );

@@ -9,7 +9,7 @@ const faqs = [
   },
   {
     q: "Do you provide home health care?",
-    a: "Not yet. careberi provides non-medical home care today: help with bathing, dressing, meals, medication reminders, companionship, and getting around. Home health care is skilled medical care, like nursing or physical therapy, ordered by a doctor, and it's something we plan to offer in the future. If your loved one needs skilled care at home now, their doctor can arrange it through a home health agency, and careberi can provide the non-medical help alongside it.",
+    a: "Not yet. careberi provides non-medical home care today: help with bathing, dressing, meals, medication reminders, companionship, and getting around. Home health care is medical care ordered by a doctor, and it's something we plan to offer in the future. If your loved one needs medical care at home now, their doctor can arrange it through a home health agency, and careberi can provide the non-medical help alongside it.",
   },
   {
     q: "How fast can you start?",
@@ -62,7 +62,7 @@ export default function Faq() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
-      <Reveal className="band-tint">
+      <Reveal>
         <div className="wrap">
           <div className="section-head center">
             <p className="eyebrow">Straight answers</p>
@@ -73,7 +73,10 @@ export default function Faq() {
           <div className="faq">
             {faqs.map((f) => (
               <details className="q" key={f.q}>
-                <summary>{f.q}</summary>
+                <summary>
+                  {f.q}
+                  <span className="pm" aria-hidden="true" />
+                </summary>
                 <div className="a">
                   <p>{f.a}</p>
                 </div>
