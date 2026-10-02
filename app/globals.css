@@ -513,6 +513,10 @@
 .probono .eyebrow{color:var(--berry-deep)}
 .probono .hl{color:var(--berry-deep)}
 .probono-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(32px,5vw,64px);align-items:center}
+/* Grid items default to min-width:auto, so they refuse to shrink below their
+   min-content width and push the row past the viewport on narrow phones. */
+.probono-grid > *{min-width:0}
+.pb-points li{overflow-wrap:break-word}
 .pb-points{list-style:none;padding:0;margin:22px 0 0;display:grid;gap:14px}
 .pb-points li{display:flex;gap:12px;align-items:flex-start;font-size:1rem;color:var(--slate)}
 .pb-points li svg{width:22px;height:22px;flex:none;margin-top:2px;stroke:var(--berry-deep)}
@@ -526,4 +530,26 @@
   .probono .wrap{padding:0 22px}
   .probono-grid{grid-template-columns:1fr;gap:28px}
   .pb-card{padding:26px 22px}
+}
+
+/* The stylesheet previously stopped at 620px, which left 320px-wide phones
+   (iPhone SE, older Androids) with a horizontal scrollbar. */
+@media (max-width:360px){
+  .wrap{padding:0 16px}
+  .probono{margin-left:10px;margin-right:10px}
+  .probono .wrap{padding:0 16px}
+  .pb-card{padding:22px 18px}
+  .pb-points li{gap:10px}
+}
+
+/* WCAG 2.5.8 wants 24px minimum; 44px is the practical target, and it matters
+   more than usual for an audience of seniors and people with limited dexterity.
+   Type sizes are unchanged - only the hit area grows. */
+@media (max-width:860px){
+  .utility .u-left a,.utility .portal,.utility .u-wide{
+    min-height:44px;display:inline-flex;align-items:center}
+  .nav a{min-height:44px;display:flex;align-items:center}
+  .brand{min-height:44px}
+  footer a{min-height:44px;display:inline-flex;align-items:center}
+  .foot-bottom a,.back-to-top{min-height:44px;display:inline-flex;align-items:center}
 }
