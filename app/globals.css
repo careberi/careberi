@@ -345,6 +345,8 @@
   /* The ring belongs to the card now, since the real control is clipped. */
   .choice-card:has(.choice-card-input:focus-visible){outline:3px solid var(--navy);outline-offset:3px}
   /* The legend carries the step heading, so the wrapper stays visually inert. */
+  /* Off-screen, not display:none — some bots skip hidden fields. */
+  .hp-field{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
   .wizard-fieldset{border:0;margin:0;padding:0;min-width:0}
   .wizard-fieldset > legend{padding:0;float:left;width:100%}
   .wizard-fieldset > legend + *{clear:both}
