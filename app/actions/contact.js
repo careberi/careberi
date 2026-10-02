@@ -4,7 +4,7 @@ import { headers } from "next/headers";
 import { Resend } from "resend";
 import { LEAD_FROM_EMAIL, LEAD_TO_EMAIL } from "../lib/site";
 import { renderLeadEmail } from "../lib/leadEmail.mjs";
-import { checkRateLimit } from "../lib/rateLimit.mjs";
+import { checkRateLimit, parseClientIp } from "../lib/rateLimit.mjs";
 import {
   AGE_RANGES,
   CARE_NEEDS,
@@ -39,8 +39,7 @@ function pickOne(value, allowed) {
 async function clientIp() {
   try {
     const h = await headers();
-    const fwd = h.get("x-forwarded-for") || "";
-    return fwd.split(",")[0].trim() || h.get("x-real-ip") || "";
+    return parseClientIp(h.get("x-forwarded-for")) || h.get("x-real-ip") || "";
   } catch {
     return "";
   }
@@ -51,8 +50,6 @@ export async function submitContactForm(payload) {
   if (payload?.company_website?.toString().trim()) {
     return { success: true, reason: payload.reason };
   }
-
-  if (!checkRateLimit(await clientIp())) return SERVER;
 
   const name = payload.name?.toString().trim();
   const email = payload.email?.toString().trim();
@@ -91,6 +88,10 @@ export async function submitContactForm(payload) {
   }
 
   if (reason === "partner" && !town) return VALIDATION;
+
+  // After validation on purpose: a rejected submission must not burn the quota,
+  // or a visitor who simply mistyped locks themselves out for ten minutes.
+  if (!checkRateLimit(await clientIp())) return SERVER;
 
   const startDate = payload.startDate || null;
   const endDate = payload.endDate || null;

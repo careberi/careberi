@@ -67,12 +67,11 @@ test("free text is HTML-escaped", () => {
   assert.ok(!html.includes("<b>bold</b>"));
 });
 
-test("the subject is escaped too", () => {
-  const { subject } = renderLeadEmail({
-    ...base,
-    name: "<script>alert(1)</script>",
-  });
-  assert.ok(!subject.includes("<script>"));
+
+test("a script payload in the subject stays inert in the body", () => {
+  const { html } = renderLeadEmail({ ...base, name: "<script>alert(1)</script>" });
+  assert.ok(!html.includes("<script>"));
+  assert.ok(html.includes("&lt;script&gt;"));
 });
 
 test("an unbroken long word cannot widen the table", () => {
@@ -141,4 +140,21 @@ test("a full-day range reads as midnight, not 12:00 AM twice", () => {
   const { html } = renderLeadEmail({ ...base, timeStart: 0, timeEnd: 24 });
   assert.ok(html.includes("12:00 AM"));
   assert.ok(html.includes("midnight"));
+});
+
+test("the subject is raw text, not HTML-escaped (it is a mail header)", () => {
+  const { subject } = renderLeadEmail({
+    ...base,
+    name: "O'Brien & Sons",
+  });
+  assert.equal(subject, "Care request — O'Brien & Sons (07030)");
+  assert.ok(!subject.includes("&#39;"));
+  assert.ok(!subject.includes("&amp;"));
+});
+
+test("the subject is escaped exactly once when placed in the body", () => {
+  const { html } = renderLeadEmail({ ...base, name: "O'Brien & Sons" });
+  assert.ok(html.includes("&amp;"), "ampersand escaped once");
+  assert.ok(!html.includes("&amp;amp;"), "not double-escaped");
+  assert.ok(!html.includes("&amp;#39;"), "not double-escaped");
 });

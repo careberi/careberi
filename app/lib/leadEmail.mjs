@@ -49,9 +49,13 @@ export function renderLeadEmail(payload) {
   const p = payload ?? {};
   const isPartner = p.reason === "partner";
 
-  const subject = isPartner
-    ? `${SUBJECT_PREFIX.partner} — ${esc(p.town)}`
-    : `${SUBJECT_PREFIX[p.reason] ?? "Enquiry"} — ${esc(p.name)} (${esc(p.zip)})`;
+  // Raw: this is an RFC-822 header, not markup. It is escaped once below, where
+  // it is interpolated into the HTML heading.
+  const rawSubject = isPartner
+    ? `${SUBJECT_PREFIX.partner} — ${p.town ?? ""}`
+    : `${SUBJECT_PREFIX[p.reason] ?? "Enquiry"} — ${p.name ?? ""} (${p.zip ?? ""})`;
+  // Collapse CR/LF: a header carrying a newline is how mail-header injection works.
+  const subject = rawSubject.replace(new RegExp("[\\r\\n]+", "g"), " ").trim();
 
   const careNeeds = Array.isArray(p.careNeeds)
     ? p.careNeeds.map((v) => labelFor(CARE_NEEDS_OPTIONS, v)).filter(Boolean)

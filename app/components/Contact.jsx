@@ -13,6 +13,7 @@ import {
   formatHour,
 } from "../lib/labels.mjs";
 import {
+  FIELD_CAPS,
   isValidEmail,
   isValidPhone,
   normalizePhone,
@@ -50,10 +51,16 @@ function sleep(ms) {
 // between the host and Resend) so a real visitor's submission doesn't get
 // lost to a one-off failure. Retries silently before surfacing any error.
 async function submitContactFormWithRetry(payload, attempts = 3) {
-  let result;
+  let result = { success: false, error: "server" };
   for (let i = 0; i < attempts; i++) {
-    result = await submitContactForm(payload);
-    if (result.success) return result;
+    try {
+      result = await submitContactForm(payload);
+      if (result.success) return result;
+    } catch {
+      // A dropped connection rejects rather than resolving. Treat it as a
+      // retryable failure, or the error never reaches the visitor at all.
+      result = { success: false, error: "server" };
+    }
     if (i < attempts - 1) await sleep(500 * (i + 1));
   }
   return result;
@@ -107,7 +114,7 @@ export default function Contact() {
     const params = new URLSearchParams(window.location.search);
     const requested = params.get("reason");
     if (REASONS.some((r) => r.value === requested)) {
-      set("reason", requested);
+      setFormData((f) => resetBranchFields(f, requested));
     }
   }, []);
 
@@ -132,7 +139,7 @@ export default function Contact() {
       const requested = url.searchParams.get("reason");
       // Only steer a form nobody has started; never throw away answers already given.
       if (stepId === "intro" && !sent && REASONS.some((r) => r.value === requested)) {
-        set("reason", requested);
+        setFormData((f) => resetBranchFields(f, requested));
       }
       window.history.replaceState(window.history.state, "", url.pathname + url.search);
       window.location.hash = "contact";
@@ -332,6 +339,7 @@ export default function Contact() {
             <input
               id="name"
               type="text"
+              maxLength={FIELD_CAPS.name}
               autoComplete="name"
               value={formData.name}
               onChange={(e) => set("name", e.target.value)}
@@ -445,7 +453,10 @@ export default function Contact() {
             {CARE_NEEDS_OPTIONS.map((opt) => (
               // A real checkbox inside the label: keyboard operation, focus ring
               // and screen-reader semantics come from the platform, not from ARIA.
-              <label key={opt.value} className="choice-card">
+              <label
+                key={opt.value}
+                className={`choice-card${formData.careNeeds.includes(opt.value) ? " selected" : ""}`}
+              >
                 <input
                   type="checkbox"
                   className="choice-card-input"
@@ -630,6 +641,7 @@ export default function Contact() {
           <label htmlFor="recipientNotes">What should we know about them?</label>
           <textarea
             id="recipientNotes"
+            maxLength={FIELD_CAPS.recipientNotes}
             placeholder="Do they have any underlying conditions? Are they recovering from a recent surgery? How would they structure their ideal day?"
             value={formData.recipientNotes}
             onChange={(e) => set("recipientNotes", e.target.value)}
@@ -651,6 +663,7 @@ export default function Contact() {
         <div>
           <textarea
             aria-label="Caregiver preferences"
+            maxLength={FIELD_CAPS.caregiverPreferences}
             placeholder="Share details here"
             value={formData.caregiverPrefs}
             onChange={(e) => set("caregiverPrefs", e.target.value)}
@@ -676,6 +689,7 @@ export default function Contact() {
           <input
             id="town"
             type="text"
+            maxLength={FIELD_CAPS.town}
             value={formData.town}
             onChange={(e) => set("town", e.target.value)}
             style={errStyle("town")}
@@ -687,6 +701,7 @@ export default function Contact() {
           <label htmlFor="story">What&apos;s going on?</label>
           <textarea
             id="story"
+            maxLength={FIELD_CAPS.story}
             placeholder="Tell us a bit about your organization and what a partnership could look like."
             value={formData.story}
             onChange={(e) => set("story", e.target.value)}
