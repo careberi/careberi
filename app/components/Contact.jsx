@@ -96,7 +96,7 @@ function sleep(ms) {
 }
 
 // Guards against transient network blips (e.g. a brief connectivity hiccup
-// between the host and Supabase) so a real visitor's submission doesn't get
+// between the host and Resend) so a real visitor's submission doesn't get
 // lost to a one-off failure. Retries silently before surfacing any error.
 async function submitContactFormWithRetry(payload, attempts = 3) {
   let result;
