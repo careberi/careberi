@@ -6,6 +6,7 @@
 *.pem
 .env
 .env*.local
-!.env.production
+
 npm-debug.log*
 .claude/
+/.superpowers
