@@ -1,4 +1,3 @@
-import UtilityBar from "./components/UtilityBar";
 import Header from "./components/Header";
 import Hero from "./components/Hero";
 import Approach from "./components/Approach";
@@ -15,7 +14,6 @@ export default function Home() {
   return (
     <>
       <div className="topbar">
-        <UtilityBar />
         <Header />
       </div>
       {/* A family's path runs unbroken from the hero to the care request; the

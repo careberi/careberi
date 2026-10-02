@@ -61,8 +61,9 @@ const NEW_JERSEY = { "@type": "State", name: "New Jersey" };
 
 const jsonLd = {
   "@context": "https://schema.org",
-  // schema.org has no non-medical home care type, so plain LocalBusiness plus Service entries.
-  "@type": "LocalBusiness",
+  // Organization rather than LocalBusiness: there is no public street address to
+  // publish, and LocalBusiness without one earns no rich results anyway.
+  "@type": "Organization",
   "@id": ORG_ID,
   name: "careberi",
   description:
@@ -73,15 +74,6 @@ const jsonLd = {
   telephone: "+1-201-266-5450",
   email: "care@careberi.com",
   areaServed: NEW_JERSEY,
-  address: { "@type": "PostalAddress", addressRegion: "NJ", addressCountry: "US" },
-  priceRange: "$36–$50 per hour",
-  // Phones are answered 24/7; 00:00–23:59 is how Google expects round-the-clock hours.
-  openingHoursSpecification: {
-    "@type": "OpeningHoursSpecification",
-    dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-    opens: "00:00",
-    closes: "23:59",
-  },
   knowsAbout: [
     "non-medical home care",
     "senior care",

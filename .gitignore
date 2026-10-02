@@ -4,8 +4,9 @@
 /build
 .DS_Store
 *.pem
-.env
-.env*.local
-!.env.production
+.env*
+
 npm-debug.log*
 .claude/
+/.superpowers
+public/hero-family.png

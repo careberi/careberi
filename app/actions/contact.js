@@ -1,115 +1,165 @@
 "use server";
 
-import { createClient } from "../../lib/supabase/server";
+import { headers } from "next/headers";
+import { Resend } from "resend";
+import { LEAD_FROM_EMAIL, LEAD_TO_EMAIL } from "../lib/site";
+import { renderLeadEmail } from "../lib/leadEmail.mjs";
+import { checkRateLimit, parseClientIp } from "../lib/rateLimit.mjs";
+import {
+  AGE_RANGES,
+  CARE_NEEDS,
+  CARE_TYPES,
+  FIELD_CAPS,
+  GENDERS,
+  REASONS,
+  RECIPIENTS,
+  isValidDateString,
+  isValidEmail,
+  isValidPhone,
+  normalizePhone,
+  todayInNewJersey,
+  zipError,
+} from "../lib/validation.mjs";
 
 // Caregiver applications are handled by CareSmartz360, not this form.
-const REASONS = new Set(["general", "probono", "partner"]);
-const CARE_TYPES = new Set(["recurring", "one_time", "live_in"]);
-const RECIPIENTS = new Set(["parent", "spouse", "adult_child", "friend_relative", "myself"]);
-const GENDERS = new Set(["female", "male"]);
-const CARE_NEEDS = new Set([
-  "household_tasks",
-  "personal_care",
-  "companionship",
-  "transportation",
-  "specialized_care",
-  "mobility_assistance",
-]);
 
-function isValidEmail(email) {
-  return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
-}
+const VALIDATION = { success: false, error: "validation" };
+const SERVER = { success: false, error: "server" };
 
-function isValidPhone(phone) {
-  return /^[0-9]{10}$/.test(phone);
-}
-
-function isValidZip(zip) {
-  return /^[0-9]{5}$/.test(zip);
-}
-
-function isNjZip(zip) {
-  if (!isValidZip(zip)) return false;
-  const n = Number(zip);
-  return n >= 7001 && n <= 8989;
-}
-
-// Care is only delivered in New Jersey, so care requests must be in-state.
-// Partners and job applicants may be anywhere.
-function isZipValidForReason(zip, reason) {
-  if (reason === "general" || reason === "probono") return isNjZip(zip);
-  return isValidZip(zip);
-}
-
-function cleanText(value) {
+function cleanText(value, cap) {
   const v = value?.toString().trim();
-  return v || null;
+  if (!v) return null;
+  return v.length > cap ? false : v;
+}
+
+function pickOne(value, allowed) {
+  return allowed.includes(value) ? value : null;
+}
+
+async function clientIp() {
+  try {
+    const h = await headers();
+    return parseClientIp(h.get("x-forwarded-for")) || h.get("x-real-ip") || "";
+  } catch {
+    return "";
+  }
 }
 
 export async function submitContactForm(payload) {
+  // A filled honeypot gets `success` on purpose: an error teaches a bot to retry.
+  if (payload?.company_website?.toString().trim()) {
+    return { success: true, reason: payload.reason };
+  }
+
   const name = payload.name?.toString().trim();
   const email = payload.email?.toString().trim();
-  const phone = payload.phone?.toString().replace(/\D/g, "");
+  const phone = normalizePhone(payload.phone);
   const zip = payload.zip?.toString().trim();
   const reason = payload.reason?.toString().trim();
 
   if (
     !name ||
+    name.length > FIELD_CAPS.name ||
     !email ||
     !isValidEmail(email) ||
-    !phone ||
     !isValidPhone(phone) ||
     !zip ||
     !reason ||
-    !REASONS.has(reason) ||
-    !isZipValidForReason(zip, reason)
+    !REASONS.includes(reason) ||
+    zipError(zip, reason) !== null
   ) {
-    return { success: false, error: "validation" };
+    return VALIDATION;
   }
 
-  if (reason === "partner" && !cleanText(payload.town)) {
-    return { success: false, error: "validation" };
+  const town = cleanText(payload.town, FIELD_CAPS.town);
+  const story = cleanText(payload.story, FIELD_CAPS.story);
+  const recipientNotes = cleanText(payload.recipientNotes, FIELD_CAPS.recipientNotes);
+  const caregiverPreferences = cleanText(
+    payload.caregiverPreferences,
+    FIELD_CAPS.caregiverPreferences
+  );
+  if (
+    town === false ||
+    story === false ||
+    recipientNotes === false ||
+    caregiverPreferences === false
+  ) {
+    return VALIDATION;
+  }
+
+  if (reason === "partner" && !town) return VALIDATION;
+
+  // After validation on purpose: a rejected submission must not burn the quota,
+  // or a visitor who simply mistyped locks themselves out for ten minutes.
+  if (!checkRateLimit(await clientIp())) return SERVER;
+
+  const startDate = payload.startDate || null;
+  const endDate = payload.endDate || null;
+  if (startDate !== null) {
+    if (!isValidDateString(startDate) || startDate < todayInNewJersey()) return VALIDATION;
+  }
+  if (endDate !== null) {
+    if (!isValidDateString(endDate)) return VALIDATION;
+    if (startDate !== null && endDate < startDate) return VALIDATION;
+  }
+
+  const timeStart = Number(payload.timeStart);
+  const timeEnd = Number(payload.timeEnd);
+  const hasTimes = payload.timeStart != null && payload.timeEnd != null;
+  if (hasTimes) {
+    const whole = (n) => Number.isInteger(n) && n >= 0 && n <= 24;
+    if (!whole(timeStart) || !whole(timeEnd) || timeStart >= timeEnd) return VALIDATION;
   }
 
   const careNeeds = Array.isArray(payload.careNeeds)
-    ? payload.careNeeds.filter((v) => CARE_NEEDS.has(v))
-    : null;
-  const careType = CARE_TYPES.has(payload.careType) ? payload.careType : null;
-  const careRecipient = RECIPIENTS.has(payload.careRecipient) ? payload.careRecipient : null;
-  const recipientGender = GENDERS.has(payload.recipientGender) ? payload.recipientGender : null;
+    ? payload.careNeeds.filter((v) => CARE_NEEDS.includes(v))
+    : [];
+
+  const lead = {
+    name,
+    email,
+    phone,
+    zip,
+    reason,
+    town,
+    story,
+    careNeeds,
+    careType: pickOne(payload.careType, CARE_TYPES),
+    startDate,
+    endDate,
+    timeStart: hasTimes ? timeStart : null,
+    timeEnd: hasTimes ? timeEnd : null,
+    careRecipient: pickOne(payload.careRecipient, RECIPIENTS),
+    recipientGender: pickOne(payload.recipientGender, GENDERS),
+    recipientAgeRange: pickOne(payload.recipientAgeRange, AGE_RANGES),
+    recipientNotes,
+    caregiverPreferences,
+  };
 
   try {
-    const supabase = await createClient();
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+      console.error("submitContactForm: RESEND_API_KEY is not set");
+      return SERVER;
+    }
 
-    const { error } = await supabase.from("contact_submissions").insert({
-      name,
-      email,
-      phone,
-      zip,
-      reason,
-      town: cleanText(payload.town),
-      story: cleanText(payload.story),
-      care_needs: careNeeds && careNeeds.length ? careNeeds : null,
-      care_type: careType,
-      start_date: payload.startDate || null,
-      end_date: payload.endDate || null,
-      time_start: payload.timeStart != null ? String(payload.timeStart) : null,
-      time_end: payload.timeEnd != null ? String(payload.timeEnd) : null,
-      care_recipient: careRecipient,
-      recipient_gender: recipientGender,
-      recipient_age_range: cleanText(payload.recipientAgeRange),
-      recipient_notes: cleanText(payload.recipientNotes),
-      caregiver_preferences: cleanText(payload.caregiverPreferences),
+    const { subject, html } = renderLeadEmail(lead);
+    const { error } = await new Resend(apiKey).emails.send({
+      from: LEAD_FROM_EMAIL,
+      to: LEAD_TO_EMAIL,
+      replyTo: email,
+      subject,
+      html,
     });
 
     if (error) {
-      console.error("contact_submissions insert failed:", error);
-      return { success: false, error: "server" };
+      console.error("lead email send failed:", error);
+      return SERVER;
     }
 
     return { success: true, reason };
   } catch (err) {
-    console.error("contact_submissions action threw:", err);
-    return { success: false, error: "server" };
+    console.error("submitContactForm threw:", err);
+    return SERVER;
   }
 }

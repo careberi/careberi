@@ -1,4 +1,5 @@
 import BerryMark from "./BerryMark";
+import { GOOGLE_REVIEW_URL } from "../lib/site";
 
 const serviceLinks = [
   { href: "#approach", label: "Our Approach" },
@@ -61,12 +62,20 @@ export default function Footer() {
           </a>
         </nav>
 
-        <div className="foot-col">
-          <p className="foot-heading">Worked with us?</p>
-          <a className="btn btn-ghost" href="#" rel="noopener">
-            Leave a review on Google
-          </a>
-        </div>
+        {/* Guarded so a blank constant can never ship a dead href="#" again. */}
+        {GOOGLE_REVIEW_URL && (
+          <div className="foot-col">
+            <p className="foot-heading">Worked with us?</p>
+            <a
+              className="btn btn-ghost"
+              href={GOOGLE_REVIEW_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Leave a review on Google
+            </a>
+          </div>
+        )}
       </div>
 
       <div className="foot-base">

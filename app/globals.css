@@ -332,11 +332,28 @@
     touch-action:manipulation;-webkit-user-select:none;user-select:none;
     transition:transform .12s ease-out,border-color .15s ease,background .15s ease}
   .choice-card.selected{border-color:var(--azure);background:#EAF3FB}
+  .choice-card:has(.choice-card-input:checked){border-color:var(--azure);background:#EAF3FB}
   .choice-card strong{display:block;font-size:1rem}
   .choice-card span span{display:block;font-size:.88rem;color:var(--slate);margin-top:2px;font-weight:400}
   .choice-card .box{width:22px;height:22px;border:2px solid var(--line);border-radius:6px;flex:none;
     display:grid;place-items:center;color:#fff;font-size:.85rem;font-weight:700}
   .choice-card.selected .box{background:var(--azure);border-color:var(--azure)}
+  .choice-card.selected .box::after{content:"✓"}
+  /* Kept separate: an unsupported :has() invalidates its whole selector list,
+     which would take the class-based rules above down with it. */
+  .choice-card:has(.choice-card-input:checked) .box{background:var(--azure);border-color:var(--azure)}
+  .choice-card:has(.choice-card-input:checked) .box::after{content:"✓"}
+  /* Clipped rather than display:none, which would drop it from the a11y tree. */
+  .choice-card-input{position:absolute;width:1px;height:1px;margin:0;padding:0;border:0;
+    clip:rect(0 0 0 0);clip-path:inset(50%);overflow:hidden;white-space:nowrap}
+  /* The ring belongs to the card now, since the real control is clipped. */
+  .choice-card:has(.choice-card-input:focus-visible){outline:3px solid var(--navy);outline-offset:3px}
+  /* The legend carries the step heading, so the wrapper stays visually inert. */
+  /* Off-screen, not display:none — some bots skip hidden fields. */
+  .hp-field{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+  .wizard-fieldset{border:0;margin:0;padding:0;min-width:0}
+  .wizard-fieldset > legend{padding:0;float:left;width:100%}
+  .wizard-fieldset > legend + *{clear:both}
   .pill-group{display:flex;flex-wrap:wrap;gap:10px}
   .pill-btn{border:2px solid var(--line);border-radius:999px;padding:10px 22px;background:#fff;
     font-weight:600;cursor:pointer;font-size:.98rem;color:var(--ink);font-family:inherit;
@@ -500,6 +517,10 @@
 .probono .eyebrow{color:var(--berry-deep)}
 .probono .hl{color:var(--berry-deep)}
 .probono-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(32px,5vw,64px);align-items:center}
+/* Grid items default to min-width:auto, so they refuse to shrink below their
+   min-content width and push the row past the viewport on narrow phones. */
+.probono-grid > *{min-width:0}
+.pb-points li{overflow-wrap:break-word}
 .pb-points{list-style:none;padding:0;margin:22px 0 0;display:grid;gap:14px}
 .pb-points li{display:flex;gap:12px;align-items:flex-start;font-size:1rem;color:var(--slate)}
 .pb-points li svg{width:22px;height:22px;flex:none;margin-top:2px;stroke:var(--berry-deep)}
@@ -514,3 +535,31 @@
   .probono-grid{grid-template-columns:1fr;gap:28px}
   .pb-card{padding:26px 22px}
 }
+
+/* The stylesheet previously stopped at 620px, which left 320px-wide phones
+   (iPhone SE, older Androids) with a horizontal scrollbar. */
+@media (max-width:360px){
+  .wrap{padding:0 16px}
+  .probono{margin-left:10px;margin-right:10px}
+  .probono .wrap{padding:0 16px}
+  .pb-card{padding:22px 18px}
+  .pb-points li{gap:10px}
+}
+
+/* WCAG 2.5.8 wants 24px minimum; 44px is the practical target, and it matters
+   more than usual for an audience of seniors and people with limited dexterity.
+   Type sizes are unchanged - only the hit area grows. */
+@media (max-width:860px){
+  .utility .u-left a,.utility .portal,.utility .u-wide{
+    min-height:44px;display:inline-flex;align-items:center}
+  .nav a{min-height:44px;display:flex;align-items:center}
+  .brand{min-height:44px}
+  footer a{min-height:44px;display:inline-flex;align-items:center}
+  .foot-bottom a,.back-to-top{min-height:44px;display:inline-flex;align-items:center}
+}
+
+.notfound{display:grid;place-items:center;min-height:72vh;text-align:center}
+.notfound .mark{width:56px;height:auto;margin:0 auto 20px}
+.notfound h1{font-size:clamp(1.6rem,4vw,2.4rem);margin:0 0 12px}
+.notfound .lede{margin:0 auto 26px;max-width:46ch}
+.nf-actions{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}

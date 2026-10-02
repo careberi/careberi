@@ -4,12 +4,25 @@ import { useEffect, useRef, useState } from "react";
 import Reveal from "./Reveal";
 import RangeSlider from "./RangeSlider";
 import { submitContactForm } from "../actions/contact";
+import {
+  REASON_OPTIONS as REASONS,
+  CARE_NEEDS_OPTIONS,
+  CARE_TYPE_OPTIONS,
+  RECIPIENT_OPTIONS,
+  AGE_RANGE_OPTIONS as AGE_RANGES,
+  formatHour,
+} from "../lib/labels.mjs";
+import {
+  FIELD_CAPS,
+  isValidEmail,
+  isValidPhone,
+  normalizePhone,
+  todayInNewJersey,
+  zipError,
+  zipRequiresNj,
+} from "../lib/validation.mjs";
+import { INITIAL_FORM_DATA, resetBranchFields } from "../lib/formState.mjs";
 
-const REASONS = [
-  { value: "general", label: "Learn more about our services" },
-  { value: "probono", label: "Pro bono care (careberi care)" },
-  { value: "partner", label: "Partnership inquiry" },
-];
 
 const CONFIRMATIONS = {
   general:
@@ -20,89 +33,34 @@ const CONFIRMATIONS = {
     "Sent. Our partnerships team will review this and reach out about working together.",
 };
 
-const CARE_NEEDS_OPTIONS = [
-  { value: "household_tasks", label: "Household tasks", desc: "Errands, housekeeping and meal prep." },
-  { value: "personal_care", label: "Personal care", desc: "Bathing, dressing and feeding." },
-  { value: "companionship", label: "Companionship", desc: "Sharing hobbies and lending an ear." },
-  { value: "transportation", label: "Transportation", desc: "Trips to appointments and errands." },
-  { value: "specialized_care", label: "Specialized care", desc: "Intellectual disability, memory support." },
-  { value: "mobility_assistance", label: "Mobility assistance", desc: "Lift, transfers, physical activity, etc." },
-];
 
-const CARE_TYPE_OPTIONS = [
-  { value: "recurring", label: "Recurring" },
-  { value: "one_time", label: "One-time" },
-  { value: "live_in", label: "Live-in" },
-];
 
-const RECIPIENT_OPTIONS = [
-  { value: "parent", label: "My parent" },
-  { value: "spouse", label: "My spouse" },
-  { value: "adult_child", label: "My adult child" },
-  { value: "friend_relative", label: "My friend/extended relative" },
-  { value: "myself", label: "Myself" },
-];
 
-const AGE_RANGES = [
-  { value: "20s", label: "20's" },
-  { value: "30s", label: "30's" },
-  { value: "40s", label: "40's" },
-  { value: "50s", label: "50's" },
-  { value: "60s", label: "60's" },
-  { value: "70s", label: "70's" },
-  { value: "80s", label: "80's" },
-  { value: "90s_plus", label: "90's+" },
-];
 
-function isValidEmail(email) {
-  return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
-}
 
-function isValidZip(zip) {
-  return /^[0-9]{5}$/.test(zip);
-}
 
-function isNjZip(zip) {
-  if (!isValidZip(zip)) return false;
-  const n = Number(zip);
-  return n >= 7001 && n <= 8989;
-}
 
-// Care is only delivered in New Jersey, so care requests must be in-state.
-// Partners and job applicants may be anywhere.
-function zipRequiresNj(reason) {
-  return reason === "general" || reason === "probono";
-}
 
-function zipError(zip, reason) {
-  if (!zip) return "Please enter your ZIP code.";
-  if (!isValidZip(zip)) return "Enter a 5-digit ZIP code.";
-  if (zipRequiresNj(reason) && !isNjZip(zip)) {
-    return "We provide care in New Jersey only. Enter an NJ ZIP code, or choose a different reason above.";
-  }
-  return null;
-}
 
-function formatHour(h) {
-  const hh = h % 24;
-  const period = hh >= 12 ? "PM" : "AM";
-  let hour12 = hh % 12;
-  if (hour12 === 0) hour12 = 12;
-  return `${hour12}:00 ${period}`;
-}
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 // Guards against transient network blips (e.g. a brief connectivity hiccup
-// between the host and Supabase) so a real visitor's submission doesn't get
+// between the host and Resend) so a real visitor's submission doesn't get
 // lost to a one-off failure. Retries silently before surfacing any error.
 async function submitContactFormWithRetry(payload, attempts = 3) {
-  let result;
+  let result = { success: false, error: "server" };
   for (let i = 0; i < attempts; i++) {
-    result = await submitContactForm(payload);
-    if (result.success) return result;
+    try {
+      result = await submitContactForm(payload);
+      if (result.success) return result;
+    } catch {
+      // A dropped connection rejects rather than resolving. Treat it as a
+      // retryable failure, or the error never reaches the visitor at all.
+      result = { success: false, error: "server" };
+    }
     if (i < attempts - 1) await sleep(500 * (i + 1));
   }
   return result;
@@ -120,29 +78,9 @@ const CARE_FLOW = [
   "caregiver-prefs",
 ];
 
-const initialFormData = {
-  name: "",
-  email: "",
-  phone: "",
-  zip: "",
-  reason: "",
-  careNeeds: [],
-  careType: "",
-  startDate: "",
-  endDate: "",
-  timeStart: 9,
-  timeEnd: 17,
-  careRecipient: "",
-  recipientGender: "female",
-  recipientAgeRange: "",
-  recipientNotes: "",
-  caregiverPrefs: "",
-  town: "",
-  story: "",
-};
 
 export default function Contact() {
-  const [formData, setFormData] = useState(initialFormData);
+  const [formData, setFormData] = useState(INITIAL_FORM_DATA);
   const [stepId, setStepId] = useState("intro");
   const [history, setHistory] = useState([]);
   const [errors, setErrors] = useState({});
@@ -153,6 +91,9 @@ export default function Contact() {
   const [direction, setDirection] = useState(1);
   const stepRef = useRef(null);
   const isFirstStep = useRef(true);
+  // `submitting` state only disables the button after React commits a render,
+  // which clicks inside the same frame can outrun. A ref cannot be outrun.
+  const submittingRef = useRef(false);
 
   // A step change swaps the whole form out, so move focus to the new step —
   // otherwise keyboard and screen reader users are dropped back at the top of the page.
@@ -173,7 +114,7 @@ export default function Contact() {
     const params = new URLSearchParams(window.location.search);
     const requested = params.get("reason");
     if (REASONS.some((r) => r.value === requested)) {
-      set("reason", requested);
+      setFormData((f) => resetBranchFields(f, requested));
     }
   }, []);
 
@@ -198,7 +139,7 @@ export default function Contact() {
       const requested = url.searchParams.get("reason");
       // Only steer a form nobody has started; never throw away answers already given.
       if (stepId === "intro" && !sent && REASONS.some((r) => r.value === requested)) {
-        set("reason", requested);
+        setFormData((f) => resetBranchFields(f, requested));
       }
       window.history.replaceState(window.history.state, "", url.pathname + url.search);
       window.location.hash = "contact";
@@ -246,10 +187,10 @@ export default function Contact() {
     else if (!isValidEmail(formData.email.trim()))
       found.email = "That doesn't look like a valid email address.";
 
-    const phoneDigits = formData.phone.replace(/\D/g, "");
+    const phoneDigits = normalizePhone(formData.phone);
     if (!phoneDigits) found.phone = "Please enter your phone number.";
-    else if (phoneDigits.length !== 10)
-      found.phone = "Enter a 10-digit phone number, including the area code.";
+    else if (!isValidPhone(formData.phone))
+      found.phone = "Enter a 10-digit US phone number, with or without a leading 1.";
 
     const zipMsg = zipError(formData.zip.trim(), formData.reason);
     if (zipMsg) found.zip = zipMsg;
@@ -280,6 +221,10 @@ export default function Contact() {
   function handleScheduleNext() {
     if (!formData.startDate)
       return setErrors({ startDate: "Please choose an estimated start date." });
+    if (formData.startDate < todayInNewJersey())
+      return setErrors({ startDate: "Please choose a start date that isn't in the past." });
+    if (formData.endDate && formData.endDate < formData.startDate)
+      return setErrors({ endDate: "The end date can't be before the start date." });
     goNext("recipient");
   }
 
@@ -296,12 +241,16 @@ export default function Contact() {
   }
 
   async function finalizeAndSubmit(extra) {
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     setSubmitting(true);
     setSubmitError(false);
 
-    const phoneDigits = formData.phone.replace(/\D/g, "");
+    const phoneDigits = normalizePhone(formData.phone);
 
-    const result = await submitContactFormWithRetry({
+    let result;
+    try {
+      result = await submitContactFormWithRetry({
       name: formData.name,
       email: formData.email,
       phone: phoneDigits,
@@ -319,11 +268,14 @@ export default function Contact() {
       recipientGender: formData.recipientGender || null,
       recipientAgeRange: formData.recipientAgeRange || null,
       recipientNotes: formData.recipientNotes || null,
-      caregiverPreferences: formData.caregiverPrefs || null,
-      ...extra,
-    });
-
-    setSubmitting(false);
+        caregiverPreferences: formData.caregiverPrefs || null,
+        company_website: formData.company_website || "",
+        ...extra,
+      });
+    } finally {
+      submittingRef.current = false;
+      setSubmitting(false);
+    }
 
     if (!result.success) {
       setSubmitError(true);
@@ -387,6 +339,7 @@ export default function Contact() {
             <input
               id="name"
               type="text"
+              maxLength={FIELD_CAPS.name}
               autoComplete="name"
               value={formData.name}
               onChange={(e) => set("name", e.target.value)}
@@ -431,9 +384,9 @@ export default function Contact() {
               id="zip"
               type="text"
               inputMode="numeric"
-              maxLength={5}
+              autoComplete="postal-code"
               value={formData.zip}
-              onChange={(e) => set("zip", e.target.value)}
+              onChange={(e) => set("zip", e.target.value.replace(/\D/g, "").slice(0, 5))}
               style={errStyle("zip")}
               aria-invalid={!!errors.zip}
             />
@@ -445,7 +398,7 @@ export default function Contact() {
           <select
             id="reason"
             value={formData.reason}
-            onChange={(e) => set("reason", e.target.value)}
+            onChange={(e) => setFormData((f) => resetBranchFields(f, e.target.value))}
             style={errStyle("reason")}
             aria-invalid={!!errors.reason}
           >
@@ -459,6 +412,19 @@ export default function Contact() {
             ))}
           </select>
           <FieldError id="reason" />
+        </div>
+        {/* Bots fill anything that looks like a website field; people never see it. */}
+        <div className="hp-field" aria-hidden="true">
+          <label htmlFor="company_website">Company website</label>
+          <input
+            id="company_website"
+            name="company_website"
+            type="text"
+            tabIndex={-1}
+            autoComplete="off"
+            value={formData.company_website}
+            onChange={(e) => set("company_website", e.target.value)}
+          />
         </div>
         <button className="btn btn-primary" type="submit">
           Next
@@ -477,30 +443,35 @@ export default function Contact() {
           handleCareNeedsNext();
         }}
       >
-        <h3>What kind of help are you looking for?</h3>
-        <p className="wizard-sub">Choose all that apply.</p>
-        <FieldError id="care-needs" />
-        <div className="choice-cards" style={errors["care-needs"] ? { outline: "2px solid #C2372F", borderRadius: 14 } : undefined}>
-          {CARE_NEEDS_OPTIONS.map((opt) => {
-            const selected = formData.careNeeds.includes(opt.value);
-            return (
-              <div
+        <fieldset className="wizard-fieldset">
+          <legend>
+            <h3>What kind of help are you looking for?</h3>
+          </legend>
+          <p className="wizard-sub">Choose all that apply.</p>
+          <FieldError id="care-needs" />
+          <div className="choice-cards" style={errors["care-needs"] ? { outline: "2px solid #C2372F", borderRadius: 14 } : undefined}>
+            {CARE_NEEDS_OPTIONS.map((opt) => (
+              // A real checkbox inside the label: keyboard operation, focus ring
+              // and screen-reader semantics come from the platform, not from ARIA.
+              <label
                 key={opt.value}
-                className={`choice-card${selected ? " selected" : ""}`}
-                onClick={() => toggleCareNeed(opt.value)}
-                role="checkbox"
-                aria-checked={selected}
-                tabIndex={0}
+                className={`choice-card${formData.careNeeds.includes(opt.value) ? " selected" : ""}`}
               >
+                <input
+                  type="checkbox"
+                  className="choice-card-input"
+                  checked={formData.careNeeds.includes(opt.value)}
+                  onChange={() => toggleCareNeed(opt.value)}
+                />
                 <span>
                   <strong>{opt.label}</strong>
                   <span>{opt.desc}</span>
                 </span>
-                <span className="box">{selected ? "✓" : ""}</span>
-              </div>
-            );
-          })}
-        </div>
+                <span className="box" aria-hidden="true" />
+              </label>
+            ))}
+          </div>
+        </fieldset>
         <StepNav />
       </form>
     );
@@ -526,6 +497,7 @@ export default function Contact() {
               key={opt.value}
               type="button"
               className={`pill-btn${formData.careType === opt.value ? " selected" : ""}`}
+              aria-pressed={formData.careType === opt.value}
               onClick={() => set("careType", opt.value)}
             >
               {opt.label}
@@ -553,6 +525,7 @@ export default function Contact() {
             <input
               id="startDate"
               type="date"
+              min={todayInNewJersey()}
               value={formData.startDate}
               onChange={(e) => set("startDate", e.target.value)}
               style={errStyle("startDate")}
@@ -565,9 +538,11 @@ export default function Contact() {
             <input
               id="endDate"
               type="date"
+              min={formData.startDate || todayInNewJersey()}
               value={formData.endDate}
               onChange={(e) => set("endDate", e.target.value)}
             />
+            <FieldError id="endDate" />
           </div>
         </div>
         <div className="wizard-field">
@@ -628,6 +603,7 @@ export default function Contact() {
             <button
               type="button"
               className={`toggle-btn${formData.recipientGender === "female" ? " selected" : ""}`}
+              aria-pressed={formData.recipientGender === "female"}
               onClick={() => set("recipientGender", "female")}
             >
               Female
@@ -635,6 +611,7 @@ export default function Contact() {
             <button
               type="button"
               className={`toggle-btn${formData.recipientGender === "male" ? " selected" : ""}`}
+              aria-pressed={formData.recipientGender === "male"}
               onClick={() => set("recipientGender", "male")}
             >
               Male
@@ -664,6 +641,7 @@ export default function Contact() {
           <label htmlFor="recipientNotes">What should we know about them?</label>
           <textarea
             id="recipientNotes"
+            maxLength={FIELD_CAPS.recipientNotes}
             placeholder="Do they have any underlying conditions? Are they recovering from a recent surgery? How would they structure their ideal day?"
             value={formData.recipientNotes}
             onChange={(e) => set("recipientNotes", e.target.value)}
@@ -685,6 +663,7 @@ export default function Contact() {
         <div>
           <textarea
             aria-label="Caregiver preferences"
+            maxLength={FIELD_CAPS.caregiverPreferences}
             placeholder="Share details here"
             value={formData.caregiverPrefs}
             onChange={(e) => set("caregiverPrefs", e.target.value)}
@@ -710,6 +689,7 @@ export default function Contact() {
           <input
             id="town"
             type="text"
+            maxLength={FIELD_CAPS.town}
             value={formData.town}
             onChange={(e) => set("town", e.target.value)}
             style={errStyle("town")}
@@ -721,6 +701,7 @@ export default function Contact() {
           <label htmlFor="story">What&apos;s going on?</label>
           <textarea
             id="story"
+            maxLength={FIELD_CAPS.story}
             placeholder="Tell us a bit about your organization and what a partnership could look like."
             value={formData.story}
             onChange={(e) => set("story", e.target.value)}
@@ -762,7 +743,9 @@ export default function Contact() {
   // Before a reason is picked the care flow is the assumed route, since it is the common one.
   const flow = formData.reason === "partner" ? PARTNER_FLOW : CARE_FLOW;
   const totalSteps = flow.length;
-  const stepNumber = flow.indexOf(stepId) + 1;
+  // Hidden until a reason is chosen: the branch decides the total, so showing it
+  // early makes the count jump from 6 to 2 mid-form.
+  const stepNumber = formData.reason ? flow.indexOf(stepId) + 1 : 0;
 
   return (
     <Reveal id="contact" className="band-tint">

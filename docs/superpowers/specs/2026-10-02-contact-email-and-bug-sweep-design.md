@@ -260,18 +260,21 @@ Classes of input the tests above do not exercise, to be checked deliberately:
 
 ## Carve-outs — Neil's checklist, outside this plan
 
-1. **Hostinger TLS ticket.** ~30% of cold HTTPS loads fail with
+1. **Hostinger TLS ticket** — raised with Hostinger by email 2026-10-02, awaiting
+   their reply. ~30% of cold HTTPS loads fail with
    `tlsv1 alert internal error`; 4/10 raw handshakes and 14/20 cold browser loads
    succeeded, while google / cloudflare / example.com / hostinger.com were 10/10
    from the same machine at the same time. Certificate is valid (Let's Encrypt,
    expires 2026-12-24). Server-side fault; no code fix exists. Also ask them to
    verify the IPv6 vhost — an AAAA record exists that could not be reached from
    the test machine.
-2. **Supabase.** Restore the project in the dashboard, export `contact_submissions`
-   to CSV, then delete the project. Do this *before* merging, while the export
-   still matters.
-3. **Resend.** Sign up, verify `send.careberi.com`, add the DKIM records, set
-   `RESEND_API_KEY` in Hostinger's environment panel.
+2. ~~**Supabase.**~~ Closed 2026-10-02: Neil confirms the table held only test
+   data, so there is nothing to export. The project can simply be deleted at
+   leisure; nothing gates the merge on it.
+3. **Resend** — approach confirmed by Neil, not yet set up. Sign up, verify
+   `send.careberi.com`, add the DKIM records, set `RESEND_API_KEY` in Hostinger's
+   environment panel. **This is the only carve-out still blocking a working form.**
+   The key can be set before the code deploys; nothing reads it until then.
 4. ~~**Google review URL.**~~ Supplied 2026-10-02: `https://g.page/r/CS99ad_3D3tKECE/review`.
 
 ## Implementation note
