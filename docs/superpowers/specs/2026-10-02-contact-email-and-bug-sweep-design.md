@@ -204,7 +204,7 @@ disproportionate here.
 |---|---|
 | 320px horizontal overflow (326 vs 320) | Root cause is structural: **the stylesheet has no breakpoint below 620px.** Add a ≤360px tier. Suspects are `.pb-card{padding:32px}` (which only relaxes at ≤860px) and `.pb-points li` (12px gap + 22px icon). Verified by asserting `scrollWidth === clientWidth` at 320×568. |
 | Tap targets below minimum | Utility-bar phone link is 90×15 — the primary "call today" CTA. → 44px min-height. Nav links 39→44, "Back to top" 22→44, "Family Portal" 28→44. Achieved with padding, keeping type sizes; inflating the font would break the bar's proportions. **This is a visible density change to the utility bar.** |
-| Footer "Leave a review on Google" is `href="#"` | Wire to `GOOGLE_REVIEW_URL` in `app/lib/site.js` with `target="_blank" rel="noopener noreferrer"`. While that constant is `null` the button does not render at all — no dead link ships. Neil supplies the value. |
+| Footer "Leave a review on Google" is `href="#"` | Wire to `GOOGLE_REVIEW_URL` in `app/lib/site.js` with `target="_blank" rel="noopener noreferrer"`. Value: `https://g.page/r/CS99ad_3D3tKECE/review`. The truthiness guard stays, so blanking the constant later cannot reintroduce a dead link. |
 | Bare Next.js 404 | `app/not-found.jsx`: mark, one line of copy, the phone number, link home, built from existing components. |
 | No security headers | `headers()` in `next.config.mjs`: `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `X-Frame-Options: DENY`, CSP `frame-ancestors 'none'`, restrictive `Permissions-Policy`, and HSTS **without `preload`**. Preload is effectively irreversible; committing to it while ~30% of TLS handshakes fail would be reckless. Add `preload` once Hostinger resolves the TLS fault. Headers must be verified with `curl` after deploy — LiteSpeed does not always honor Next's `headers()`. |
 | `cache-control: s-maxage=31536000` | → `public, s-maxage=3600, stale-while-revalidate=86400`. A one-year shared-cache TTL is why copy edits can appear not to deploy. |
@@ -272,7 +272,7 @@ Classes of input the tests above do not exercise, to be checked deliberately:
    still matters.
 3. **Resend.** Sign up, verify `send.careberi.com`, add the DKIM records, set
    `RESEND_API_KEY` in Hostinger's environment panel.
-4. **Google review URL.** Supply it, or the footer button stays unrendered.
+4. ~~**Google review URL.**~~ Supplied 2026-10-02: `https://g.page/r/CS99ad_3D3tKECE/review`.
 
 ## Implementation note
 

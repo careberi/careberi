@@ -363,7 +363,13 @@ Expected: PASS.
 npm install resend
 ```
 
-Add to `app/lib/site.js`: `LEAD_TO_EMAIL = "neil@careberi.com"`, `LEAD_FROM_EMAIL = "careberi forms <forms@send.careberi.com>"`, and `GOOGLE_REVIEW_URL = null`.
+Add to `app/lib/site.js`:
+
+```js
+export const LEAD_TO_EMAIL = "neil@careberi.com";
+export const LEAD_FROM_EMAIL = "careberi forms <forms@send.careberi.com>";
+export const GOOGLE_REVIEW_URL = "https://g.page/r/CS99ad_3D3tKECE/review";
+```
 
 - [ ] **Step 6: Rewrite `app/actions/contact.js`**
 
@@ -598,7 +604,7 @@ In `app/layout.jsx`, change the JSON-LD `@type` from `LocalBusiness` to `Organiz
 
 - [ ] **Step 3: Gate the footer review button**
 
-In `Footer.jsx`, import `GOOGLE_REVIEW_URL` and render the "Leave a review on Google" anchor only when it is truthy, with `target="_blank" rel="noopener noreferrer"`. While it is `null` the button must not render at all — no `href="#"` may ship.
+In `Footer.jsx`, import `GOOGLE_REVIEW_URL` and render the "Leave a review on Google" anchor only when it is truthy, with `target="_blank" rel="noopener noreferrer"`. The guard stays even though the value is now set, so a future blanking of the constant cannot reintroduce an `href="#"`. Verify the rendered markup contains the `g.page` URL and no `href="#"`.
 
 - [ ] **Step 4: Add the 404 page**
 
@@ -665,4 +671,4 @@ Verification of criteria 1–2 depends on the first of these.
 1. **Resend:** sign up, verify `send.careberi.com`, add the DKIM records, set `RESEND_API_KEY` in Hostinger's environment panel.
 2. **Supabase:** restore the project, export `contact_submissions` to CSV, then delete it — before this branch merges, while the export still matters.
 3. **Hostinger TLS ticket:** ~30% of cold HTTPS loads fail with `tlsv1 alert internal error`. Server-side; no code fix. Ask them to check the IPv6 vhost too.
-4. **Google review URL:** supply it to set `GOOGLE_REVIEW_URL`, or the footer button stays unrendered.
+4. ~~**Google review URL**~~ — supplied: `https://g.page/r/CS99ad_3D3tKECE/review`. Verified live (HTTP 200, Maps reviews-dialog deep link); the place ID was not independently confirmed as careberi's listing, so Neil should click it once.
