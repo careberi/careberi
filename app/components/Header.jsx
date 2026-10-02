@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import BerryMark from "./BerryMark";
+import UtilityBar from "./UtilityBar";
 
 const links = [
   { href: "#approach", label: "Our Approach" },
@@ -96,6 +97,8 @@ export default function Header() {
 
   return (
     <header ref={headerRef}>
+      {/* Inside the landmark so no page content sits outside one. */}
+      <UtilityBar />
       <div className="bar">
         <a
           className="brand"
