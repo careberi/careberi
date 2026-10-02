@@ -477,30 +477,32 @@ export default function Contact() {
           handleCareNeedsNext();
         }}
       >
-        <h3>What kind of help are you looking for?</h3>
-        <p className="wizard-sub">Choose all that apply.</p>
-        <FieldError id="care-needs" />
-        <div className="choice-cards" style={errors["care-needs"] ? { outline: "2px solid #C2372F", borderRadius: 14 } : undefined}>
-          {CARE_NEEDS_OPTIONS.map((opt) => {
-            const selected = formData.careNeeds.includes(opt.value);
-            return (
-              <div
-                key={opt.value}
-                className={`choice-card${selected ? " selected" : ""}`}
-                onClick={() => toggleCareNeed(opt.value)}
-                role="checkbox"
-                aria-checked={selected}
-                tabIndex={0}
-              >
+        <fieldset className="wizard-fieldset">
+          <legend>
+            <h3>What kind of help are you looking for?</h3>
+          </legend>
+          <p className="wizard-sub">Choose all that apply.</p>
+          <FieldError id="care-needs" />
+          <div className="choice-cards" style={errors["care-needs"] ? { outline: "2px solid #C2372F", borderRadius: 14 } : undefined}>
+            {CARE_NEEDS_OPTIONS.map((opt) => (
+              // A real checkbox inside the label: keyboard operation, focus ring
+              // and screen-reader semantics come from the platform, not from ARIA.
+              <label key={opt.value} className="choice-card">
+                <input
+                  type="checkbox"
+                  className="choice-card-input"
+                  checked={formData.careNeeds.includes(opt.value)}
+                  onChange={() => toggleCareNeed(opt.value)}
+                />
                 <span>
                   <strong>{opt.label}</strong>
                   <span>{opt.desc}</span>
                 </span>
-                <span className="box">{selected ? "✓" : ""}</span>
-              </div>
-            );
-          })}
-        </div>
+                <span className="box" aria-hidden="true" />
+              </label>
+            ))}
+          </div>
+        </fieldset>
         <StepNav />
       </form>
     );
@@ -526,6 +528,7 @@ export default function Contact() {
               key={opt.value}
               type="button"
               className={`pill-btn${formData.careType === opt.value ? " selected" : ""}`}
+              aria-pressed={formData.careType === opt.value}
               onClick={() => set("careType", opt.value)}
             >
               {opt.label}
@@ -628,6 +631,7 @@ export default function Contact() {
             <button
               type="button"
               className={`toggle-btn${formData.recipientGender === "female" ? " selected" : ""}`}
+              aria-pressed={formData.recipientGender === "female"}
               onClick={() => set("recipientGender", "female")}
             >
               Female
@@ -635,6 +639,7 @@ export default function Contact() {
             <button
               type="button"
               className={`toggle-btn${formData.recipientGender === "male" ? " selected" : ""}`}
+              aria-pressed={formData.recipientGender === "male"}
               onClick={() => set("recipientGender", "male")}
             >
               Male
