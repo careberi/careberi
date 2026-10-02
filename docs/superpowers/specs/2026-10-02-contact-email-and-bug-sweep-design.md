@@ -48,9 +48,11 @@ Each is independently verifiable.
    `lib/supabase/` no longer exists.
 4. A keyboard-only user can select care needs with Space or Enter and reach
    submission without a pointer.
-5. Three rapid clicks on Submit produce exactly one server-action POST and one
-   email. (The existing retry loop may still fire up to three POSTs when a send
-   *fails*; this criterion is about the success path.)
+5. Three clicks dispatched inside one frame on Submit produce exactly one
+   server-action POST and one email. Measured with three parallel
+   `click({noWaitAfter:true})` calls, since sequential clicks are already blocked
+   by the existing `disabled` state. (The retry loop may still fire up to three
+   POSTs when a send *fails*; this criterion is about the success path.)
 6. `+1 201 555 0123` and `1-201-555-0123` are accepted; `0000000000` is rejected.
 7. Pasting `" 07030"` or `07030-1234` into the ZIP field yields a valid `07030`.
 8. `document.documentElement.scrollWidth === clientWidth` at 320×568.
@@ -186,12 +188,11 @@ disproportionate here.
 
 | Defect | Fix |
 |---|---|
-| Three rapid clicks produced 6 POSTs (two full submissions) | A `useRef` guard at the top of `finalizeAndSubmit`. Refs update synchronously, so unlike `disabled={submitting}` it cannot be outrun by clicks landing before React commits a re-render. |
-| No pending feedback for ~2s | Button label → "Sending…", plus `aria-busy`. The silence is *why* people click twice. |
+| Three simultaneous clicks produced 6 POSTs (two full submissions) | A `useRef` guard at the top of `finalizeAndSubmit`. Refs update synchronously, so unlike `disabled={submitting}` they cannot be outrun by clicks landing inside the same frame. **Narrower than first reported:** `StepNav` already disables the button and shows "Sending…" within 77ms of the click, so an ordinary human double-click (150–300ms apart) is already blocked. Reproducing the duplicate needs clicks under ~70ms apart — a bouncing input, a scripted submit, or a bot. Still worth closing; the guard is three lines. |
 | **Keyboard users cannot complete the form** | The care-need cards are `<div role="checkbox" tabIndex={0}>` with only an `onClick`; Space and Enter do nothing, and step 2 is mandatory. Replace with a visually-hidden real `<input type="checkbox">` inside `<label class="choice-card">`, wrapped in `<fieldset><legend>`. This *deletes* the custom ARIA rather than adding a key handler to it — native keyboard, focus ring, and screen-reader semantics come free. WCAG 2.1.1 (Level A). Note: axe-core reported zero violations here, which is why it went unnoticed. |
 | Pills and toggles carry no state for assistive tech | `aria-pressed` on the care-type and gender buttons. They are real `<button>`s, so keyboard already works. |
 | ZIP silently truncates pastes | Remove `maxLength={5}`; strip non-digits and slice to 5 in `onChange`, so `" 07030"` and `07030-1234` both resolve to `07030`. |
-| No autofill | `autoComplete` on name / email / tel / postal-code; `inputMode="tel"` on phone. Materially helps older users. |
+| ZIP lacks an autofill hint | `autoComplete="postal-code"` on the ZIP input. **Correction:** `autoComplete` is already present and correct on name, email and phone — ZIP is the only field missing it. |
 | Past and inverted dates accepted | `min={today}` on start, `min={startDate}` on end, plus the shared check. |
 | Full day renders "12:00 AM–12:00 AM" | `formatHour` special-cases 24 → "midnight", giving `12:00 AM–midnight`. Max stays 24 so "until midnight" remains expressible. |
 | Step counter jumps "1 of 6" → "1 of 2" | Do not render the total until `reason` is chosen. |
